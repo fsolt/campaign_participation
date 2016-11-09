@@ -1,0 +1,625 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}  	% Enable graphics commands
+\usepackage{lscape}		% Enable landscape with \begin{landscape} until \end{landscape}
+\usepackage[section]{placeins} % Keep tables and figures within their own sections
+\usepackage{natbib}			% Enable citation commands \citep{}, \citet{}, etc.
+\bibpunct{(}{)}{;}{a}{}{,}		% Formatting for in-text citations
+\usepackage{setspace}		% Enable double-spacing with \begin{spacing}{2} until \end{spacing}.
+\usepackage[utf8]{inputenc} 	% Enable utf8 characters, i.e., accents without coding--just type them in.
+\usepackage[english]{babel}	% English hyphenation and alphabetization.  Other languages available.
+\usepackage{dcolumn}        % For decimal-aligned stargazer output.
+\usepackage[colorlinks=true, urlcolor=blue, citecolor=black, linkcolor=black]{hyperref} % Include hyperlinks with the \url and \href commands.
+\setlength{\tabcolsep}{1pt}	% Make tables slightly narrower by reducing space between columns.
+
+\renewcommand\floatpagefraction{.9}	% These commands allow larger tables and graphics to fit
+\renewcommand\topfraction{.9}		% on a page when default settings would complain.
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}
+\setcounter{totalnumber}{50}
+\setcounter{topnumber}{50}
+\setcounter{bottomnumber}{50}
+
+\newcommand{\R}{\textsf{R}~}        %This creates the command \R to typeset the name R correctly.
+
+%\usepackage[left=1in, right=1in]{geometry}	%Turn footnotes into endnotes (commented out).
+%\renewcommand{\footnotesize}{\normalsize}	
+%\usepackage{endnotes}
+%\renewcommand{\footnote}{\endnote}
+%\renewcommand{\section}{\subsection}
+
+\usepackage{fullpage}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+
+\title{Economic Inequality and\\ Campaign Participation}		
+% \author{
+%     Michael Ritter\\
+%     \href{mailto:michael-ritter@uiowa.edu}{michael-ritter@uiowa.edu}
+%     \and
+%     Frederick Solt\\
+%     \href{mailto:frederick-solt@uiowa.edu}{frederick-solt@uiowa.edu}
+% }
+\date{}				
+\maketitle
+
+\begin{abstract}
+How does economic inequality shape participation in political campaigns?  Several studies have found that higher levels of inequality make people of all incomes less likely to participate in politics, consistent with relative power theory, the view that greater inequality enables wealthier citizens to more fully reshape the political landscape to their own advantage.  These works, however, addressed relatively undemanding forms of participation like voting.  Campaign activities demand more of participants' time and money and so might better conform to the predictions of resource theory, which focuses narrowly on the ramifications of inequality for individuals' resources.  We combine individual-level data on donations, meeting attendance, and volunteer work for political campaigns with measures of state-level income inequality to construct a series of multilevel models.  The analyses reveal that, where inequality is higher, campaign participation is lower among individuals of all incomes, providing additional support for the relative power theory.
+\end{abstract}
+
+
+\newpage					
+\begin{spacing}{2}
+Economic inequality has risen dramatically in the United States over the past several decades; by some measures, income is now more concentrated than at any time since the start of the Great Depression \citep[see, e.g.,][24]{Piketty2014}.  Although the consequences of such high levels of inequality for participation in elections have attracted sustained attention \citep[see, e.g.,][]{Brady2004, Galbraith2008, Solt2010}, participation in the campaigns that precede elections has not yet been examined.  
+
+This is an important oversight because voting is a fairly undemanding form of political participation.   Studies of voting have found that higher levels of inequality make people of all incomes less likely to participate in politics.   This is consistent with relative power theory, the view that greater inequality enables wealthier citizens to more fully reshape the political landscape to their own advantage.  Campaign activities place more demands on participants' time and money and so might be expected to be better predicted by arguments that focus narrowly on the ramifications of inequality for individuals' resources.  If they are, the understanding of economic inequality's political effects that is provided by the relative power theory will stand in need of revision.
+
+In this article, we present multilevel models that bring together data on individual campaign participation (donating money, attending meetings, and volunteering for campaigns) from the 2012 Cooperative Congressional Election Study with data on the context of income inequality in the fifty states provided by the U.S. Census Bureau. According to these analyses, people regardless of income are less likely to be involved in campaigns when inequality is higher.  This finding indicates that even participation in those political activities that depend most heavily on resources is better explained by the relative power theory than by arguments that focus only only on the implications of inequality for individual resources.
+
+
+\section*{Economic Inequality, Income, and Participation}
+
+Anticipated by \citet{Schattschneider1960}, introduced by \citet{Goodin1980}, and elaborated by \citet{Solt2008}, the relative power theory maintains that economic inequality yields political inequality.  It contends that contexts of greater economic inequality enable richer individuals not simply to prevail more often in an actual political contests, but also to more fully reshape the political agenda to effectively exclude issues poorer citizens would have otherwise wished to debate, and even to more completely convince these poorer citizens to abandon preferences they would have otherwise held.  Compared to more equal contexts, political debate will revolve more exclusively around arguments among richer citizens; attempts to raise issues that would tend to cleave richer and poorer citizens are drowned out by the money-magnified voices of both sides involved in ongoing arguments among the rich.  As a consequence of the more restricted scope of politics in unequal settings, people of all incomes are expected to become less likely to participate: the poor because their needs are unlikely to be debated let alone ultimately addressed, and the rich to the extent that they consider their internecine struggles to be of less importance than whatever matters would have pitted them against the poor.
+
+The resource theory provides the leading alternative argument about the relationship between inequality and participation to that proposed by the relative power theory.  As \citet{Verba1995} explain, participation in politics places demands on individuals' time and money.  Participating in politics, and especially in campaigns, is like any other normal good in this view: those with more money and time will consume more of it than those with less \citep{Ansolabehere2003}.  Coupled with the facts that higher inequality by definition means that more money is concentrated in fewer hands and that those with more money are better able to afford the cost of time spent not working, the focus on resources yields the hypothesis that greater inequality will result in \emph{more} participation by the relatively affluent and less participation only among the relatively poor.\footnote{\doublespacing Yet a third theoretical perspective contends that the more divergent material conditions of richer and poorer citizens in contexts of higher inequality will spark more contentious---and therefore more interesting---politics and so coincide with greater rates of participation across all income levels \citep[see][]{Brady2004}.  This conflict theory, however, has not received much empirical support in prior research.  We therefore focus our discussion here on the predictions of the relative power and resource theories.}
+
+Substantial empirical evidence has accumulated of late for the prediction of relative power theory that more economic inequality is associated with less political participation.  \citet{Solt2010} shows that citizens of all incomes are less likely to vote in gubernatorial elections when they live in states with higher levels of inequality.  \citet{Solt2008} examines voting, political discussion, and political interest across countries and finds more inequality is associated with significantly less political engagement among all but those in the richest quintile.  \citet{Karakoc2013} finds that people of all incomes belong to fewer civil-society associations where inequality is greater.  \citet{Solt2015} documents that, where inequality is higher, participation in nonviolent protest activities---signing petitions, engaging in boycotts, and joining lawful demonstrations---is lower for people in all but the richest quintile.  These studies find no evidence that political participation by people at any income level is higher when inequality is greater.
+
+However, none of the activities examined in these studies are ostensibly very resource intensive, at least not in comparison to the costs of participating in campaign activities.  Voting is routinely considered to be among the least demanding political activities, requiring as it does no money and usually little time.  The demands made on one's time of even participating in a demonstration could be as little as an hour or two; and signing a petition or expressing an interest in politics can take less than a minute.  Paying dues to a membership organization may be the most costly of the activities studied in this body of work, but many civil-society associations are free to join, and the data examined in \citet{Karakoc2013} do not distinguish between those associations that require members to pay dues and those that do not.
+
+Political activities that are more demanding of people's time and money may be reasonably expected to exhibit the different patterns that are predicted by the resource theory.  There is some evidence that this may be the case.  \citet{Lancee2012}, for example, examined the more time-consuming phenomenon of actual attendance and participation in the activities of civic associations, rather than mere membership.  They found that individuals from relatively poor households were less likely to participate but those from relatively affluent households were more likely to participate in the activities of civic associations in more unequal settings than in more egalitarian contexts.  This work provides some support for the view that participation in activities that place greater demands on participants' resources exhibit different relationships with inequality than activities that are less resource intensive.  As campaign activities like donating and volunteering place significant demands on individuals' resources, the resource theory may offer the best explanation for their relationship with economic inequality.
+
+To discern whether the relative power theory or either of the two hypotheses generated by the resource theory best predicts how economic inequality and campaign participation are related, we will need information about the campaign participation of people with differing incomes and living in differing contexts of inequality.  The data we use and the method we employ to analyze them are described in the next section.
+
+
+\section*{Data and Method}
+
+<<label=setup, echo=FALSE, results=hide>>==
+library(foreign)
+library(ggplot2)
+library(plyr)
+library(reshape2)
+library(car)
+
+study.dir <- "~/Documents/Projects/Workflow/Michael/Campaign3/"
+cces <- read.dta(paste0(study.dir, "cces_short.dta"), convert.factors=F)
+cces0 <- cces
+cces1 <- cces0[complete.cases(cces0), ]
+ivs <- c("gini_st1", "gdppc", "div_st", "inits_st", "gov_st", "sen_st", "sw_mar",
+         "age", "educated", "rep", "dem", "black", "hisp",
+         "male", "married", "children", "church", "unionmem", "income")
+cces <- cces[, ivs]
+cces <- cces[complete.cases(cces), ]
+ivs <- c("constant", ivs, "giniXincome")
+
+@
+
+<<label=summary, echo=FALSE, results=hide>>==
+cp.state <- ddply(cces0, .(state), summarize,
+                  postal = StateAbbr[1],
+                  donate = round(weighted.mean(donate, V103)*100),
+                  meet = round(weighted.mean(meetings, V103)*100),
+                  work = round(weighted.mean(polwork, V103)*100),
+                  gini = round(mean(gini_st1), 1),
+                  wt = sum(V103))
+
+cp.state$wt <- cp.state$wt/max(cp.state$wt)
+
+cp.cor <- data.frame(variable = c("Make Donation", "Attend Meetings", "Work for Campaign"))
+cp.cor$variable <- as.character(cp.cor$variable)
+cp.cor$r <- NA
+cp.cor$ypos <- NA
+
+for (i in 1:3) {
+  cp.cor$r[i] <- paste0("R = -", formatC(round((summary(lm(cp.state[, i+2] ~ cp.state$gini, weights = cp.state$wt))$r.squared)^.5, 2), format = 'f', digits = 2))
+  cp.cor$ypos[i] <- .98*max(cp.state[, i+2])
+}
+
+cp.st1 <- melt(cp.state, id.vars=c("state", "postal", "gini", "wt"))
+
+levels(cp.st1$variable)[levels(cp.st1$variable)=="donate"] <- "Make Donation"
+levels(cp.st1$variable)[levels(cp.st1$variable)=="meet"]   <- "Attend Meetings"
+levels(cp.st1$variable)[levels(cp.st1$variable)=="work"]   <- "Work for Campaign"        
+
+@
+
+
+To measure the dependent variable, participation in campaigns, we employ data drawn from the 2012 Cooperative Congressional Election Study (CCES).  The CCES is a nationwide, online survey of over 54,000 respondents drawn from all fifty states.  The 2012 survey was conducted in two waves, the first during the month before the November general election and the second within two weeks afterwards \citep[7]{Ansolabehere2013}.  The CCES asked respondents whether in the past year they had (1) donated money to a candidate, campaign, or political organization; (2) attended a local political meeting; or (3) worked for a candidate or campaign.  Following previous research \citep[see, e.g.,][125-127]{Schlozman2012}, we use these three items to measure campaign participation, but to allow for variation across these different activities, we analyze each of these items as a separate dichotomous variable rather than combining them into a single index or scale.
+
+% There was considerable variation in participation in these campaign activities across states.  According to weighted data from the CCES, \Sexpr{max(cp.state$donate)}\% of residents of \Sexpr{cp.state$state[which(cp.state$donate==max(cp.state$donate))]} made political donations, but only \Sexpr{min(cp.state$donate)}\% of those living in \Sexpr{cp.state$state[which(cp.state$donate==min(cp.state$donate))]} donated.  In \Sexpr{cp.state$state[which(cp.state$meet==max(cp.state$meet))]}, \Sexpr{max(cp.state$meet)}\% reported attending a political meeting, while in \Sexpr{cp.state$state[which(cp.state$meet==min(cp.state$meet))]} only \Sexpr{min(cp.state$meet)}\% did.  North Dakotan respondents also reported the highest rate of working for political campaigns, \Sexpr{max(cp.state$work)}\%
+% In \Sexpr{cp.state$state[which(cp.state$work==max(cp.state$work))]}
+% \Sexpr{min(cp.state$work)}\% 
+% \Sexpr{cp.state$state[which(cp.state$work==min(cp.state$work))]}
+
+%The survey has been criticized as being unrepresentative of that nation as a whole because the survey is online, and because it consists of self-reported data. The survey is weighted by state to account for the possible unrepresentativeness of the survey, so the survey is representative across all the American states. The self-reported nature of the data mainly employed in this study is admittedly a limitation, but one which is outweighed by the large number of representative observations derived from this survey for the purposes of my study.
+
+The primary independent variable, economic inequality, was measured using data from the U.S. Census Bureau's 2011 American Community Survey, specifically the Gini index of household income inequality for each state \citep[5]{Noss2012}.\footnote{\doublespacing The Census Bureau's measure of income includes that gained from market sources, private transfers, and government transfers; it regrettably does not take taxes into account.  Following previous scholarship, it is used here because it remains the best data currently available on inequality at the state level \citep[see, e.g.,][]{Solt2010, Kelly2012}.}  The Gini index has a theoretical range of 0, if every household receives the same income, to 100, if one household receives all of the income and the rest receive none.  Although income inequality is high and has risen across all of the states over the past few decades, there is still considerable variation.  In the least unequal state by this measure, \Sexpr{cp.state$state[which(cp.state$gini==min(cp.state$gini))]}, the Gini index was \Sexpr{min(cp.state$gini)}.  On the other hand, \Sexpr{cp.state$state[which(cp.state$gini==max(cp.state$gini))]} was the most unequal state, with a Gini index of \Sexpr{max(cp.state$gini)}.  Arizona and Pennsylvania flanked the median Gini index of the states, \Sexpr{median(cp.state$gini)}.
+
+<<label=scatter_plot, echo=F, fig=T, include=F, width = 12, height = 5>>==
+ggplot(data = cp.st1, aes(y = value, x = gini, label=postal)) +
+  geom_text(aes(alpha=wt^.2)) + 
+  facet_wrap(~ variable, scales = "free") +
+  theme_bw() +
+  geom_text(data=cp.cor, aes(x=49, y=ypos, label=r), 
+                    colour="black", inherit.aes=FALSE, parse=FALSE) +
+  theme(legend.position="none", strip.text.x = element_text(size=12, face="bold"),
+        strip.background = element_rect(colour="white", fill="white")) +
+  ylab("") +
+  xlab("Income Inequality") +
+  scale_x_continuous(limits=c(39.2, 50.8), breaks=seq(40, 50, 2))
+@
+
+\begin{figure}[!htbp] 
+  \caption{Income Inequality and Campaign Participation By State}
+  \label{F:scatter}
+  \begin{center}
+    \includegraphics[width=6in]{CP1-scatter_plot.pdf}
+  \end{center}
+  \begin{footnotesize}
+  \begin{tabular}{p{.2in} p{5.8in}}
+  & \emph{Note}: States are shaded to depict the sum of the weights of their individual-level observations; states with fewer effective observations are lighter.  Weighted bivariate correlations are shown.
+  \end{tabular}
+  \end{footnotesize}
+\end{figure}
+
+Figure~\ref{F:scatter} depicts the bivariate relationships between income inequality and the three measures of campaign participation examined here. Two points stand out.  First, there is considerable variation in campaign participation (as well as income inequality) across the states.  Second, all three of these relationships are discernibly negative; however, with the exception of that between inequality and meeting attendance, these relationships are quite weak.  The weighted bivariate correlations between inequality and each the two most resource-intensive activities---making donations and working for campaigns---do not reach statistical significance.
+
+But many other individual- and state-level characteristics affect political participation, including in campaigns, and must also be taken into account.  At the individual level, relative income is particularly important to the theories examined here.  The CCES asked respondents to identify their families' annual incomes on a sixteen-category scale with values ranging from less \$10,000 to more than \$500,000.  Because the same income falls in different positions of the income distribution in different states, relative income was measured by dividing these sixteen categories into quintiles within each state.  While an annual family income of \$80,000 was sufficient to reach the richest quintile in Arkansas or Mississippi, for example, at least \$120,000 was needed in New Jersey or Virginia.  To facilitate interpretation, the variable was centered so that 0 represents the median quintile, -2 the poorest quintile, and 2 the richest quintile. 
+
+The CCES also provides data on many other individual-level characteristics well understood to be associated with at least some forms of political participation: age, education, partisan identification, race and ethnicity, gender, marital status, number of children, frequency of church attendance, and union membership.\footnote{\doublespacing Two other variables common in the literature on voting, home ownership and length of residence, were found not to be strongly associated with campaign participation, and their inclusion does not affect our conclusions.}  We include these variables as controls in our analysis.  
+
+There are also aspects of state context that have been found to be associated with various forms of political participation that are important to consider here. The extent of racial and ethnic diversity in the state has been found to depress political participation \citep[see, e.g.,][]{Hill1999}.  As economic inequality and ethnic diversity are positively related across the states ($R = $ \Sexpr{round(cor(cces$gini_st1, cces$div_st), 2)}), including diversity as a control is necessary to avoid omitted-variable bias.  Whether a state is, on average, wealthier or poorer may also be important, and as richer states tend to be slightly more unequal than poorer ones ($R = $ \Sexpr{round(cor(cces$gini_st1, cces$gdppc), 2)}), we include state gross domestic product per capita as a control as well.  The campaign setting itself is also likely to affect participation.  The presence on the ballot of a high-profile statewide race in addition to the presidential contest can reasonably be hypothesized to increase the chances that people participated in the campaign.  We include separate indicators for the states that held a concurrent gubernatorial election and for the states that elected senators in 2012.  People are also more likely to participate when there is a closely contested race in their state \citep[see, e.g.,][]{Cox1989}, so we include the margin of the closest statewide race (presidential, gubernatorial, or senatorial) as well.  Finally, because ballot issues have the potential to draw more people to engage with campaigns \citep[see, e.g.,][]{Tolbert2005}, the number of initiatives on the ballot in the state is also included in the model.  Coding and sources for all included variables are provided in Appendix A.
+
+Because the data include variables at the levels of the individual and of the state, a multilevel model is necessary to avoid underestimating the standard errors of the contextual variables \citep[see, e.g.,][]{Steenbergen2002}.  And because the resource theory contends that whether the context of inequality depresses or encourages participation depends on individual's position in the income distribution, a multiplicative interaction of inequality and relative income must also be included.  Therefore, for individual $i$ in state $j$, the logged odds of each of the three forms of campaign participation was estimated as follows:
+{\setlength\arraycolsep{2pt} 
+\begin{eqnarray}
+\label{E:mixed}
+  Campaign\thinspace Participation_{ij} & = & \gamma_{00}+\gamma_{10}Income\thinspace Quintile_{ij}
+  \nonumber\\
+  & & {}+\gamma_{30}Age_{ij}+\gamma_{40}Education_{ij}{}+\gamma_{50}Republican_{ij}
+  \nonumber\\
+  & & {}+\gamma_{60}Democrat_{ij}+\gamma_{70}Black_{ij}+\gamma_{80}Latino_{ij}
+  \nonumber\\
+  & & {}+\gamma_{90}Male_{ij}{}+\gamma_{100}Married_{ij}{}+\gamma_{110} Children_{ij}
+    \nonumber\\
+  & & {}+\gamma_{120}Church\thinspace Attendance_{ij}{}+\gamma_{130}Union\thinspace Member_{ij}{}
+  \nonumber\\ 
+  & &{}+\gamma_{01}Inequality_{j}+\gamma_{11}Inequality_{j} \times Income\thinspace Quintile_{j}
+  \nonumber\\
+  & &{}+\gamma_{02}Ethnic\thinspace Diversity_{j}+\gamma_{03}GDP/Capita_{j}
+  \nonumber\\
+  & &{}+\gamma_{04}Ballot\thinspace Initiatives_{j}+\gamma_{05}Gubernatorial\thinspace Race_{j}
+  \nonumber\\
+  & &{}+\gamma_{05}Senate\thinspace Race_{j}+\gamma_{06}Statewide\thinspace Margin_{j}
+  \nonumber\\
+  & &{}+r_{0j}+u_{0j}
+ \end{eqnarray}
+}
+
+\noindent The inclusion of separate error terms for each state, $u_{0j}$, takes into account any state-level effects that are not in the model and so ameliorates any potential omitted variable bias while also ensuring that the standard errors of the state-level predictors are correctly calculated.  The model was fit using the HLM software package.
+
+Before proceeding to the results, we pause to review the expectations of the two theories tested.  The relative power theory suggests that the coefficient of income inequality will be negative for people in all income quintiles.  That is, that $\gamma_{01}$ will have a larger absolute magnitude than the product of income quintile and $\gamma_{11}$ for all values of income quintile.  The resource theory contends that poorer people will become less likely to participate when inequality is higher, but richer people will become more likely to participate: that $\gamma_{01}$ will be negative, but for richer income quintiles, the product of income quintile and $\gamma_{11}$ will be larger than $\gamma_{01}$.
+
+\section*{Analysis and Results}
+
+<<echo=F, results=hide>>==
+importHLM <- function(file = NULL) {
+  varcov <- read.table(file)
+  
+  b <- as.vector(varcov[1,], mode="double")
+  varcov <- as.matrix(varcov[-1,])
+  
+  se <- diag(chol(diag(diag(varcov), length(diag(varcov)))))
+  no <- 1:length(b)
+  
+  results <- data.frame(no, b, se)
+  
+  return(results)
+}
+
+simsHLM <- function(file = NULL, n = 10000, seed = 324) {
+  # H/T http://www.quantumforest.com/2011/10/simulating-data-following-a-given-covariance-structure/
+  varcov <- read.table(file)
+  
+  betas <- as.vector(varcov[1,])
+  varcov <- as.matrix(varcov[-1,])
+  se <- diag(chol(diag(diag(varcov), length(diag(varcov)))))
+  
+  L <- chol(varcov)
+  n.vars <- dim(L)[1]
+
+  set.seed(seed)
+  sims <- t(t(L) %*% matrix(rnorm(n.vars*n), nrow=n.vars, ncol=n))
+  
+  for (v in 1:ncol(sims)) {
+    sims[,v] <- sims[,v] + as.numeric(betas[v])
+  }
+  
+  sims <- as.data.frame(sims)
+  names(sims) <- ivs
+  return(sims)
+}
+
+# Regression Results Graph Prep
+donate.reg <- importHLM(file=paste0(study.dir,"donate/gamvcpar.dat"))
+meetings.reg <- importHLM(file=paste0(study.dir,"meetings/gamvcpar.dat"))
+polwork.reg <- importHLM(file=paste0(study.dir,"polwork/gamvcpar.dat"))
+
+donate.sims <- simsHLM(file=paste0(study.dir,"donate/gamvcpar.dat"))
+meetings.sims <- simsHLM(file=paste0(study.dir,"meetings/gamvcpar.dat"))
+polwork.sims <- simsHLM(file=paste0(study.dir,"polwork/gamvcpar.dat"))
+
+donate.sims$dv <- "Make Donation"
+meetings.sims$dv <- "Attend Meetings"
+polwork.sims$dv <- "Work for Campaign"
+
+sims <- rbind(donate.sims, meetings.sims, polwork.sims)
+
+var <- c("Intercept", "Income Inequality", "GDP/Capita", "Ethnic Diversity", 
+         "Ballot Initiatives", "Gubernatorial Race", "Senatorial Race",
+         "Margin, Statewide Races", "Age", "Education",
+         "Republican", "Democrat", "African-American", "Latino", "Male", 
+         "Married", "Children", "Church Attendance", "Union Member",
+         "Income Quintile", "Inequality*Income Quintile")
+
+sds <- apply(cces, 2, function(x) sd(x, na.rm=T)) 
+sds <- c(1, sds, sds[1]*sds[length(sds)])
+dich.ivs <- c("gov_st", "sen_st", "rep", "dem", "black", "hisp", "male", "married", "unionmem")
+sds[dich.ivs] <- .5
+
+donate.reg <- cbind(donate.reg, var, ivs, sds)
+donate.reg$dv <- "Make Donation"
+meetings.reg <- cbind(meetings.reg, var, ivs, sds)
+meetings.reg$dv <- "Attend Meetings"
+polwork.reg <- cbind(polwork.reg, var, ivs, sds)
+polwork.reg$dv <- "Work for Campaign"
+
+ineq.median <- quantile(cces$gini_st1, prob=.5)
+
+donate.reg$b[donate.reg$ivs=="income"] <- mean(donate.sims$income + ineq.median * donate.sims$giniXincome)
+donate.reg$se[donate.reg$ivs=="income"] <- sd(donate.sims$income + ineq.median * donate.sims$giniXincome)
+
+meetings.reg$b[meetings.reg$ivs=="income"] <- mean(meetings.sims$income + ineq.median * meetings.sims$giniXincome)
+meetings.reg$se[meetings.reg$ivs=="income"] <- sd(meetings.sims$income + ineq.median * meetings.sims$giniXincome)
+
+polwork.reg$b[polwork.reg$ivs=="income"] <- mean(polwork.sims$income + ineq.median * polwork.sims$giniXincome)
+polwork.reg$se[polwork.reg$ivs=="income"] <- sd(polwork.sims$income + ineq.median * polwork.sims$giniXincome)
+
+reg.results <- rbind(donate.reg[-1,], meetings.reg[-1,], polwork.reg[-1,])
+reg.results$dv <- factor(reg.results$dv, levels=c("Make Donation", "Attend Meetings", "Work for Campaign"))
+reg.results$b <- with(reg.results, b*2*sds) 
+reg.results$se <- with(reg.results, se*2*sds) 
+reg.results$lb <- with(reg.results, b - 1.96*se) 
+reg.results$ub <- with(reg.results, b + 1.96*se)
+reg.results$no[reg.results$no>=3] <- reg.results$no[reg.results$no>=3] + 1
+reg.results$no[reg.results$var=="Income Inequality"] <- 1
+reg.results$no[reg.results$var=="Inequality*Income Quintile"] <- 2
+reg.results$no[reg.results$var=="Income Quintile"] <- 3
+reg.results$no[reg.results$var=="Ethnic Diversity"] <- 4
+reg.results$no[reg.results$var=="GDP/Capita"] <- 5
+reg.results <- reg.results[with(reg.results, order(dv, no)), ]
+
+offset <- .2
+reg.results$no[reg.results$dv=="Make Donation"] <- reg.results$no[reg.results$dv=="Make Donation"] - offset
+reg.results$no[reg.results$dv=="Work for Campaign"] <- reg.results$no[reg.results$dv=="Work for Campaign"] + offset
+
+n.vars <- length(donate.reg$var)-1
+
+
+# Inequality Coefficients Graph Prep
+coef1 <- data.frame(coef = with(sims, gini_st1 + giniXincome * -2), dv = sims$dv)
+coef2 <- data.frame(coef = with(sims, gini_st1 + giniXincome * -1), dv = sims$dv)
+coef3 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 0), dv = sims$dv)
+coef4 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 1), dv = sims$dv)
+coef5 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 2), dv = sims$dv)
+
+coef1$quintile <- "Poorest Quintile"
+coef2$quintile <- "Second Quintile"
+coef3$quintile <- "Median Quintile"
+coef4$quintile <- "Fourth Quintile"
+coef5$quintile <- "Richest Quintile"
+
+coefs <- rbind(coef1, coef2, coef3, coef4, coef5)
+
+coefs.sum <- ddply(coefs, .(dv, quintile), summarize, 
+                   b = mean(coef),
+                   ub = quantile(coef, 0.975),
+                   lb = quantile(coef, 0.025))
+
+coefs.sum$quintile <- factor(coefs.sum$quintile, levels=c("Poorest Quintile", 
+                                                          "Second Quintile", 
+                                                          "Median Quintile", 
+                                                          "Fourth Quintile", 
+                                                          "Richest Quintile"))
+
+coefs.sum$dv <- factor(coefs.sum$dv, levels=c("Make Donation", "Attend Meetings", "Work for Campaign"))
+
+coefs.sum.unstd <- coefs.sum
+
+coefs.sum[3:5] <- coefs.sum[3:5] * sds[1] * 2
+
+pd <- position_dodge(.25)
+@
+
+<<label=reg_plot, echo=F, fig=T, include=F, width = 9, height = 6>>=
+ggplot(data = reg.results, aes(y = no, x = b, colour=dv)) +
+  geom_point() + geom_errorbarh(aes(xmin = lb, xmax = ub, height=0)) +
+  ylab("") + xlab("") + theme_bw() + 
+  scale_colour_manual(values = c("red","black", "blue")) +
+  scale_y_reverse(breaks = 1:n.vars, labels = reg.results[1:n.vars,"var"]) +
+  theme(legend.title=element_blank(), legend.position=c(.875, .1)) +
+  geom_vline(xintercept=c(0), linetype="dotted")
+@
+
+<<label=coef_plot, echo=F, fig=T, include=F, width = 9, height = 6>>=
+ggplot(data = coefs.sum, aes(x = quintile, y = b, colour = dv)) +
+  geom_point(position = pd) + 
+  geom_errorbar(aes(ymin = lb, ymax = ub, width = 0), position=pd) +
+  ylab("Standardized Coefficient for Inequality") + xlab("") + theme_bw() + 
+  scale_colour_manual(values = c("red","black", "blue")) +
+  theme(legend.title=element_blank(), legend.position=c(.1, .9)) +
+  geom_hline(yintercept=c(0), linetype="dotted")
+
+@
+
+<<echo=F, results=hide>>==
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  require(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+pp.data <- function(dv = NULL) {
+  dv.sims <- get(paste0(dv, ".sims"))
+  dv.sims <- dv.sims[, -length(dv.sims)]
+  df <- cces
+  df$constant <- 1
+  df$giniXincome <- with(df, gini_st1*income)
+  df <- df[ivs]
+  vars.mean <- data.frame(t(colMeans(df)))
+  for(i in seq(length(ivs))) {
+    tab <- table(df[, ivs[i]])
+    if (length(tab) == 2) {
+      vars.mean[i] <- as.numeric(names(tab[which(tab == max(tab))]))
+    }
+  }
+  fake.data <- vars.mean[rep(1:nrow(vars.mean),each=100), ] 
+  fake.data$gini_st1 <- with(df, rep(seq(min(gini_st1), max(gini_st1), length.out=20), times=5))
+  fake.data$income <- rep(-2:2, each=20)
+  fake.data$giniXincome <- with(fake.data, gini_st1 * income)
+  fake.data <- fake.data[fake.data$income==-2 | fake.data$income==2, ]
+  
+  pp <- rowMeans(plogis(data.matrix(fake.data) %*% t(data.matrix(dv.sims))))
+  rowQuantiles <- function (x, probs = seq(from = 0, to = 1, by = 0.25), ..., drop = TRUE) {
+    naValue <- NA
+    storage.mode(naValue) <- storage.mode(x)
+    nrow <- nrow(x)
+    q <- matrix(naValue, nrow = nrow, ncol = length(probs))
+    if (nrow > 0L) {
+      t <- quantile(x[1L, ], probs = probs, ...)
+      colnames(q) <- names(t)
+      q[1L, ] <- t
+      if (nrow >= 2L) {
+        for (rr in 2:nrow) {
+          q[rr, ] <- quantile(x[rr, ], probs = probs, ...)
+        }
+      }
+    }
+    else {
+      t <- quantile(0, probs = probs, ...)
+      colnames(q) <- names(t)
+    }
+    if (drop) {
+      q <- drop(q)
+    }
+    q
+  }
+  pp.b <- rowQuantiles(plogis(data.matrix(fake.data) %*% t(data.matrix(dv.sims[, 1:21]))), prob = c(.025, .975))
+  pp <- cbind(pp, pp.b)
+  pp <- pp*100
+  colnames(pp) <- c("est", "lb", "ub")
+  pp <- cbind(fake.data, pp)
+  pp$income <- as.factor(pp$income)
+  return(pp)
+}
+
+pp.donate <- pp.data("donate")
+pp.meetings <- pp.data("meetings")
+pp.polwork <- pp.data("polwork")
+
+pp.donate.plot <- ggplot(pp.donate, aes(x = gini_st1, y = est, group = income)) + 
+  geom_line(aes(colour = income)) + 
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
+  xlab("") + ylab("") +
+  theme_bw() + theme(legend.position="none") +
+  ggtitle("Make Donation") + theme(plot.title = element_text(face="bold")) +
+  geom_text(aes(44, 39, label="Richest Quintile", color="2")) +
+  geom_text(aes(43, 9, label="Poorest Quintile", color="-2")) +
+  scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
+  scale_colour_manual(values = c("red", "blue")) +
+  scale_fill_manual(values = c("red", "blue"))
+
+pp.meetings.plot <- ggplot(pp.meetings, aes(x = gini_st1, y = est, group = income)) + 
+  geom_line(aes(colour = income)) + 
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
+  xlab("Income Inequality") + ylab("") +
+  theme_bw() + theme(legend.position="none") +
+  ggtitle("Attend Meetings") + theme(plot.title = element_text(face="bold")) +
+  geom_text(aes(44, 18.7, label="Richest Quintile", color="2")) +
+  geom_text(aes(43, 7, label="Poorest Quintile", color="-2")) +
+  scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
+  scale_colour_manual(values = c("red", "blue")) +
+  scale_fill_manual(values = c("red", "blue"))
+
+pp.polwork.plot <- ggplot(pp.polwork, aes(x = gini_st1, y = est, group = income)) + 
+  geom_line(aes(colour = income)) + 
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
+  xlab("") + ylab("") +
+  theme_bw() + theme(legend.position="none") +
+  ggtitle("Work for Campaign") + theme(plot.title = element_text(face="bold")) +
+  geom_text(aes(45, 8, label="Richest Quintile", color="2")) +
+  geom_text(aes(43, 3.8, label="Poorest Quintile", color="-2")) +
+  scale_y_continuous(limits=c(2, 10)) +
+  scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
+  scale_colour_manual(values = c("red", "blue")) +
+  scale_fill_manual(values = c("red", "blue"))
+@
+
+<<label=pp_plot, echo=F, fig=T, include=F, width = 12, height = 5>>=
+multiplot(pp.donate.plot, pp.meetings.plot, pp.polwork.plot, layout = matrix(c(1, 2, 3), nrow=1))
+@
+
+Figure~\ref{F:reg_plot} presents the results of the multilevel regression models as a dotplot: the dots represent the logit coefficients and the whiskers the associated 95\% confidence intervals \citep[see][]{Kastellec2007}.  To allow easier comparison, the coefficients of the ordinal and continuous independent variables were rescaled by multiplying the unstandardized coefficients by twice the standard deviation of the variable.  The rescaled coefficients represent the expected change in the logged odds of the dependent variable occurring for a change in the independent variable from one standard deviation below to one standard deviation above its mean, and so are directly comparable to those for the dichotomous independent variables \citep[see][]{Gelman2008a}.  The control variables perform as expected: older and better-educated individuals were more likely to donate money, attend meetings, and volunteer for campaigns than their younger and worse-educated counterparts.  Those who identified as Republicans and especially Democrats were more likely to donate or volunteer than independents, though they attended political meetings at similar rates.  African-Americans and Latinos were considerably less likely than Anglo whites to participate in campaigns.  Men were more likely to women to donate money or attend meetings, but otherwise similar people of both genders volunteered to work on campaigns at similar rates.  Married people were less likely to participate in campaign activities.  The estimated coefficient for children is negative for donating money but positive for attending meetings; that for volunteering is negative but cannot be distinguished from zero in these data.  More frequent church attendance was associated with higher rates of meeting attendance and campaign volunteering but lower rates of political donations.  Union members were more likely than otherwise similar non-members to engage in all three forms of campaign participation. 
+
+\begin{figure}[!hbtp] 
+  \caption{Effects of Income Inequality on Campaign Participation}
+  \label{F:reg_plot}
+  \begin{center}
+    \includegraphics[width=6in]{CP1-reg_plot.pdf}
+  \end{center}
+  \begin{footnotesize}
+  \begin{tabular}{p{.2in} p{5.8in}}
+  & \emph{Note}: The dots represent estimated change in the logged odds of the dependent variable occurring for a change of two standard deviations in the independent variable; the whiskers represent the 95\% confidence intervals of these estimates.
+  \end{tabular}
+  \end{footnotesize}
+\end{figure}
+
+Turning toward our variables of greatest interest, we note first that the estimated coefficients of the two variables in the multiplicative interaction term, income inequality and income quintile, each vary with the value of the other variable \citep[see][]{Brambor2006}.  The coefficients depicted in Figure~\ref{F:reg_plot} for each variable are calculated with the other variable taking on its median value.  One can see, therefore, that the coefficient of inequality is negative for those with median incomes and that the coefficient of income is positive in the median context of income inequality, but one cannot assess the competing claims of relative power theory and the resource theory without more information about how the coefficient of inequality varies across income quintiles.
+
+Figure~\ref{F:coef_plot} provides the necessary information.  It shows that the estimated coefficient for income inequality is negative and statistically significant across all income quintiles for campaign donations and for meeting attendance; for volunteering, it is estimated to be negative for all incomes but fails to reach statistical significance for those with incomes in the richest two quintiles.  In states with higher levels of income inequality, people are less likely to participate in political campaign activities regardless of their own incomes.  These results are consistent with the relative power theory and contradict the expectation of the resource theory that greater inequality would be associated with increased rates of participation among those in richer income quintiles.
+
+\begin{figure}[!hbtp] 
+  \caption{Estimated Coefficients of Income Inequality by Income Quintile}
+  \label{F:coef_plot}
+  \begin{center}
+    \includegraphics[width=6in]{CP1-coef_plot.pdf}
+  \end{center}
+  \begin{footnotesize}
+  \begin{tabular}{p{.2in} p{5.8in}}
+  & \emph{Source}: Analyses presented in Figure~\ref{F:reg_plot}.  The dots represent estimated change in the logged odds of the dependent variable occurring for a change of two standard deviations in the income inequality; the whiskers represent the 95\% confidence intervals of these estimates.  
+  \end{tabular}
+  \end{footnotesize}
+\end{figure}
+
+Of course, because the dependent variables are dichotomous, the coefficient estimates are in logits.  This makes their magnitudes difficult to assess directly.  We used the model parameters estimated in Figure~\ref{F:reg_plot} to compute the predicted probabilities that an individuals in the poorest and richest quintiles would participate in campaigns over the observed range of income inequality, assuming mean values for the other individual- and state-level variables \citep[see][]{King2000}.
+
+\begin{figure}[!hbtp] 
+  \caption{Predicted Probability of Campaign Participation by Income and Level of Inequality}
+  \label{F:pp_plot}
+  \begin{center}
+    \includegraphics[width=6in]{CP1-pp_plot.pdf}
+  \end{center}
+  \begin{footnotesize}
+  \begin{tabular}{p{.2in} p{5.8in}}
+  & \emph{Source}: Analyses presented in Figure~\ref{F:reg_plot}.  Solid lines represent predicted probabilities and shaded regions represent the 95\% confidence intervals of these predictions.  The predicted probabilities were generated by fixing all other variables at their mean values.
+  \end{tabular}
+  \end{footnotesize}
+\end{figure}
+
+Figure~\ref{F:pp_plot} plots the results, showing that inequality sharply reduces participation in all three campaign activities examined here.  Consider first campaign donations, shown in the leftmost panel of the figure.  In a state with income inequality matching that of Wyoming, the lowest observed, an otherwise typical person in the poorest quintile was estimated to have 14\% chance (plus or minus 2 percentage points) of making a political donation.  This probability falls by nearly half, to $8\pm1$\%, for a similar person in a state with New York's level of income inequality, the highest observed.  For such individuals in the richest quintile, the predicted probability of making a political donation falls by about a third, from $32\pm5$\% to $22\pm3$\%, as inequality ranges from its lowest to highest observed value.
+
+People are also much less likely to attend political meetings when inequality is higher, as shown in the center panel.  For those in the poorest quintile, the predicted probability of having attended a political meeting during the campaign is $12\pm2$\% at the lowest observed level of inequality, but less than half that, $5\pm1$\%, at the highest observed level.  For those in the richest quintile, the predicted probability of attending meetings drops from $16\pm3$\% to $9\pm2$\%.
+
+Finally, the left panel of Figure~\ref{F:pp_plot} presents the predicted probabilities of volunteering to work for a campaign.  Again assuming otherwise mean characteristics, those in the poorest quintile have a predicted probability of volunteering of $6\pm2$\% when they live in a state with the lowest observed level of inequality.  This predicted probability declines to $3.1\pm0.6$ when inequality is at highest observed level.  For those in the richest quintile, volunteering does not change by a statistically significant amount over the range of income inequality: the predicted probability varies from $6\pm2$\% to $5\pm1$\%.\footnote{\doublespacing For those with incomes in the median quintile, the predicted probability of volunteering ranges from $6\pm1$\% to $3.9\pm0.8$ over the observed range of income inequality.}
+
+\section*{Discussion and Conclusion}
+
+As the growth of economic inequality in the United States over the past several decades has become increasingly apparent, the crucial questions of how and to what extent it may lead to political inequality have begun to draw sustained attention from scholars.  This study provides a first examination of the relationship between economic inequality and participation in campaign activities.  Analyzing data on political donations, attendance at political meetings, and volunteering for political campaigns in 2012, it finds support for the predictions of the relative power theory: where income inequality is higher, campaign participation is lower, regardless of individuals' incomes.  This accords with the results of previous studies that examined less resource-intensive forms of political participation and undercuts the argument that activities that demand more time and money from participants will be better explained by the resource theory.  
+
+Along with better illuminating the relationship between inequality and participation, these results also provide new support for arguments recently made in the study of representation.  A number of recent works have documented how legislators are much more responsive to the preferences of richer Americans than they are to those of their poorer constituents, both in Congress \citep{Bartels2008, Gilens2012} and in the statehouses \citep{Rigby2011a}.  And, as \citet{Rigby2013} have found, this attentiveness to the views of the affluent begins early in the policymaking process, with the policy positions taken by state political parties.  This line of scholarship has surmised that higher levels of inequality work to strengthen the relationship between income and responsiveness by making politicians increasingly dependent on the campaign support of fewer, wealthier donors (e.g., \citealt[252]{Gilens2012}; \citealt[563-564]{Rigby2013}).  Our finding that people are less likely to participate in campaigns---and specifically that people of all incomes are less likely to make campaign donations---provides a first empirical confirmation of this causal mechanism.  As we have shown, when economic inequality is greater, politicians do in fact draw on a smaller number of donors; such circumstances make them more reliant on the bigger gifts that only the affluent can make.  It is not surprising, then, that politicians in turn respond only to the views of the wealthy.
+
+Finally, that participation in campaigns is lower where economic inequality is higher provides direct evidence of the state of the ongoing struggle for democracy and political equality in America.  Higher levels of inequality do more than merely signify that some have more of the resources needed to participate while others have fewer of these resources.  Consistent with Schattschneider's (\citeyear{Schattschneider1960}) theorizing of more than a half-century ago, patterns of campaign activity indicate that economic inequality empowers wealthy citizens to reduce the scope and importance of politics in ways that make all citizens less likely to get involved.  Where the gap between richer and poorer citizens are larger, democracy is correspondingly further from being reality.
+
+
+\end{spacing}
+
+\pagebreak
+\appendix
+
+\section{Measures and Data Sources}
+
+\begin{table}[hbtp] 
+\begin{tabular}{l p{10cm}}
+\textbf{Individual Characteristics}\\
+\hline
+\hline
+Make Donation & Dummy variable coded one if respondent made a political donation in the past year. \emph{Source}: 2012 Cooperative Congressional Election Study \citep{Ansolabehere2013a}.\\
+Attend Meetings & Dummy variable coded one if respondent attended a political meeting in the past year. \emph{Source}: 2012 CCES.\\
+Work for Campaign & Dummy variable coded one if respondent did volunteer work for a political campaign in the past year. \emph{Source}: 2012 CCES.\\
+Income Quintile & Quintile within state of respondent's household income. \emph{Source}: 2012 CCES.\\
+Absolute Income & Midpoint of respondent's household income category, in tens of thousands of dollars. \emph{Source}: 2012 CCES.\\
+Age & Respondent's age in years. \emph{Source}: 2012 CCES.\\
+Education & Respondent's education on six-point scale: 1. less than high school diploma, 2. high school graduate, 3. some college, 4. 2-year college degree, 5. 4-year college degree, 6. post-graduate degree. \emph{Source}: 2012 CCES.\\
+Republican & Dummy variable coded one if respondent was Republican, zero otherwise. \emph{Source}: 2012 CCES.\\
+Democrat & Dummy variable coded one if respondent was Democrat, zero otherwise. \emph{Source}: 2012 CCES.\\
+African American & Dummy variable coded one if respondent was African American, zero otherwise. \emph{Source}: 2012 CCES.\\
+Latino & Dummy variable coded one if respondent was latino, zero otherwise. \emph{Source}: 2012 CCES.\\
+Male & Dummy variable coded one if respondent was male, zero otherwise. \emph{Source}: 2012 CCES.\\
+Married & Dummy variable coded one if respondent was married, zero otherwise. \emph{Source}: 2012 CCES.\\
+Church Attendance & Respondent's attendance at religious services on six-point scale: 1. never, 2. seldom, 3. few times a year, 4. once or twice a month, 5. once a week, 6. more than once a week. \emph{Source}: 2012 CCES.\\
+Union Member & Dummy coded one if respondent was a union member, zero otherwise. \emph{Source}: 2012 CCES.\\
+\hline
+\hline
+\end{tabular}
+\end{table}
+
+\vspace{1in}
+
+\begin{table}[hbtp]
+\begin{tabular}{l p{10cm}}
+\textbf{Contextual Characteristics}\\
+\hline
+\hline
+Income Inequality & Gini coefficient of household income as measured in the 2011 American Community Survey.
+\emph{Source}: \citet{Noss2012}.\\
+GDP/Capita  & 2011 state gross domestic product per capita, thousands of 2009 dollars.  \emph{Source}: U.S. Department of Commerce, Bureau of Economic Analysis.\\ 
+Ethnic Diversity & Probability that two randomly selected state residents belong to different racial or ethnic groups, calculated from standardized data from the U.S. Census. \emph{Source}: U.S. Census Bureau.\\
+Ballot Initiatives & Number of initiatives appearing on the state ballot.  \emph{Source}: Initiative \& Referendum Institute, University of Southern California, \texttt{http://www.iandrinstitute.org}.\\
+Gubernatorial Race & Dummy variable coded one if there was a simultaneous gubernatorial election, zero otherwise. \\
+Senatorial Race & Dummy variable coded one if there was a simultaneous U.S. Senate election, zero otherwise. \\
+Margin, Statewide Races &  Percentage of votes cast for winner minus percentage for second-place candidate in state's closest statewide race (governatorial, senatorial, or presidential).\\
+\hline
+\hline
+\end{tabular}
+\end{table}
+
+\clearpage
+\pagebreak
+\newpage
+\bibliographystyle{ajps}
+\bibliography{FSLibrary}
+
+\end{document}
+
