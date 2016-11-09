@@ -1,0 +1,35 @@
+#HLM2 MDM CREATION TEMPLATE
+vknown:n
+growthmodel:n
+rawdattype:other
+l1fname:Y:\Documents\Projects\Workflow\Michael\Campaign3\polwork\polwork_l1.csv  /delim
+l2fname:Y:\Documents\Projects\Workflow\Michael\Campaign3\polwork\polwork_l2.csv  /delim
+l1missing:n
+timeofdeletion:now
+mdmname:polwork.mdm
+*begin l1vars
+level2id:STATE2
+ POLWORK    
+     AGE    
+EDUCATED    
+     REP    
+     DEM    
+   BLACK    
+    HISP    
+    MALE    
+ MARRIED    
+CHILDREN    
+  CHURCH    
+UNIONMEM    
+  INCOME    
+*end l1vars
+*begin l2vars
+level2id:STATE2
+GINI_ST1    
+   GDPPC    
+  DIV_ST    
+INITS_ST    
+  GOV_ST    
+  SEN_ST    
+  SW_MAR    
+*end l2vars
