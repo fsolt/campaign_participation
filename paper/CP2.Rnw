@@ -74,7 +74,7 @@ This finding indicates that even participation in those political activities tha
 \section*{Economic Inequality, Income, and Participation}
 
 Anticipated by \citet{Schattschneider1960}, introduced by \citet{Goodin1980}, and elaborated by \citet{Solt2008}, the relative power theory maintains that economic inequality yields political inequality.
-It contends that contexts of greater economic inequality enable richer individuals not simply to prevail more often in an actual political contests, but also to more fully reshape the political agenda to effectively exclude issues poorer thatcitizens would have otherwise wished to debate, and even to more completely convince these poorer citizens to abandon preferences they would have otherwise held.
+It contends that contexts of greater economic inequality enable richer individuals not simply to prevail more often in an actual political contests, but also to more fully reshape the political agenda to effectively exclude issues poorer that citizens would have otherwise wished to debate, and even to more completely convince these poorer citizens to abandon preferences they would have otherwise held.
 Compared to more equal contexts, political debate will revolve more exclusively around arguments among richer citizens; attempts to raise issues that would tend to cleave richer and poorer citizens are drowned out by the money-magnified voices of both sides involved in ongoing arguments among the rich.
 As a consequence of the more restricted scope of politics in unequal settings, people of all incomes are expected to become less likely to participate: the poor because their needs are unlikely to be debated let alone ultimately addressed, and the rich to the extent that they consider their internecine struggles to be of less importance than whatever matters would have pitted them against the poor.
 
@@ -210,7 +210,11 @@ ggplot(data = cp.st1, aes(y = value, x = gini, label=postal)) +
 
 Figure~\ref{F:scatter} depicts the bivariate relationships between income inequality and the three measures of campaign participation examined here.
 Two points stand out.
-First, there is considerable variation in campaign participation (as well as income inequality) across the states. %address nationalization of politics here
+First, there is considerable variation in campaign participation (as well as in income inequality) across the states.
+\footnote{It is perhaps worth underscoring that variation across states undercuts any claim that `all politics is national.' 
+That people in different states participate at different rates suggests either that the extent to which the issues and debates of politics motivate people to participate or the extent to which people are capable of participating varies across states.
+Whether these differences in participation are consistent with arguments that levels of inequality shape the former, as the relative power theory contends, or the latter, as the resource theory would have it, is an empirical question.}
+
 Second, all three of these relationships are discernibly negative; however, with the exception of that between inequality and meeting attendance, these relationships are quite weak.
 The weighted bivariate correlations between inequality and each the two most resource-intensive activities---making donations and working for campaigns---do not reach statistical significance.
 
