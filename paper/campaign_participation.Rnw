@@ -265,9 +265,9 @@ The primary independent variable, economic inequality, was measured using data f
 Following previous scholarship, it is used here because it remains the best data currently available on inequality at the state level \citep[see, e.g.,][]{Solt2010, Kelly2012}.}
 The Gini coefficient has a theoretical range of 0, if every household receives the same income, to 1, if one household receives all of the income and the rest receive none.
 Although income inequality is high and has risen across all of the states over the past few decades, there is still considerable variation.
-%In the least unequal state by this measure, \Sexpr{state_vars$state[which(cp.state$gini==min(cp.state$gini))]}, the Gini coefficient was \Sexpr{min(cp.state$gini)}.
-%On the other hand, \Sexpr{cp.state$state[which(cp.state$gini==max(cp.state$gini))]} was the most unequal state, with a Gini index of \Sexpr{max(cp.state$gini)}.
-%Arizona and Pennsylvania flanked the median Gini index of the states, \Sexpr{median(cp.state$gini)}.
+In the least unequal state by this measure, \Sexpr{state_vars$state[which(state_vars$gini==min(state_vars$gini))]}, the Gini coefficient was \Sexpr{min(state_vars$gini)}.
+On the other hand, \Sexpr{state_vars$state[which(state_vars$gini==max(state_vars$gini))]} was the most unequal state, with a Gini index of \Sexpr{max(state_vars$gini)}.
+Arizona and Pennsylvania flanked the median Gini index of the states, \Sexpr{median(state_vars$gini)}.
 
 <<label=scatter, fig.show="hide">>==
 ggplot(data = cp_st1, aes(y = value, x = gini, label = postal)) +
@@ -294,12 +294,12 @@ ggsave("figures/scatter.pdf", width = 12, height = 5)
 
 Figure~\ref{F:scatter} depicts the bivariate relationships between income inequality and the three measures of campaign participation examined here.
 Two points stand out.
-First, there is considerable variation in campaign participation (as well as in income inequality) across the states.\footnote{It is perhaps worth underscoring that variation across states undercuts any claim that `all politics is national.' 
+First, there is considerable variation in campaign participation (as well as in income inequality) across the states.\footnote{\doublespacing It is perhaps worth underscoring that variation across states undercuts any claim that `all politics is national.' 
 That people in different states participate at different rates suggests either that the extent to which the issues and debates of politics motivate people to participate or the extent to which people are capable of participating varies across states.
-Whether these differences in participation are consistent with arguments that levels of inequality shape the former, as the relative power theory contends, or the latter, as the resource theory would have it, is an empirical question.}
+Whether these differences in participation are consistent with arguments that levels of inequality shape the former, as the relative power theory contends, or the latter, as the resource theory would have it, is an empirical question that we examine below.}
 
-Second, all three of these relationships are discernibly negative; however, with the exception of that between inequality and meeting attendance, these relationships are quite weak.
-The weighted bivariate correlations between inequality and each the two most resource-intensive activities---making donations and working for campaigns---do not reach statistical significance.
+Second, all three of these relationships are negative; however, with the exception of that between inequality and meeting attendance, these relationships are quite weak.
+The bivariate correlations between inequality and each the two most resource-intensive activities---making donations and working for campaigns---do not reach statistical significance.
 
 But many other individual- and state-level characteristics affect political participation, including in campaigns, and must also be taken into account.
 At the individual level, relative income is particularly important to the theories examined here.
@@ -313,8 +313,8 @@ We include these variables as controls in our analysis.
 
 There are also aspects of state context that have been found to be associated with various forms of political participation that are important to consider here.
 The extent of racial and ethnic diversity in the state has been found to depress political participation \citep[see, e.g.,][]{Hill1999}.
-%As economic inequality and ethnic diversity are positively related across the states ($R = $ \Sexpr{round(cor(cces$gini_st1, cces$div_st), 2)}), including diversity as a control is necessary to avoid omitted-variable bias.
-%Whether a state is, on average, wealthier or poorer may also be important, and as richer states tend to be slightly more unequal than poorer ones ($R = $ \Sexpr{round(cor(cces$gini_st1, cces$gdppc), 2)}), we include state gross domestic product per capita as a control as well.
+As economic inequality and ethnic diversity are positively related across the states ($R = $ \Sexpr{round(cor(state_vars$gini, state_vars$div_st), 2)}), including diversity as a control is necessary to avoid omitted-variable bias.
+Whether a state is, on average, wealthier or poorer may also be important, and as richer states tend to be slightly more unequal than poorer ones ($R = $ \Sexpr{sprintf("%.2f", cor(state_vars$gini, state_vars$gdppc))}), we include state gross domestic product per capita as a control as well.
 The campaign setting itself is also likely to affect participation.
 The presence on the ballot of a high-profile statewide race in addition to the presidential contest can reasonably be hypothesized to increase the chances that people participated in the campaign.
 We include separate indicators for the states that held a concurrent gubernatorial election and for the states that elected senators in 2012.
