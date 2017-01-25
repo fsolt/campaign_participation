@@ -31,7 +31,12 @@
 \usepackage{fullpage}
 
 \begin{document}
-\SweaveOpts{concordance=TRUE}
+
+<<label=preamble, include=FALSE>>=
+library(knitr)
+opts_chunk$set(concordance=TRUE, cache=TRUE, warning=FALSE, message=FALSE, echo=FALSE, results='hide')
+@
+
 
 
 \title{Economic Inequality and\\ Campaign Participation}		
@@ -80,8 +85,7 @@ As a consequence of the more restricted scope of politics in unequal settings, p
 
 The resource theory provides the leading alternative argument about the relationship between inequality and participation to that proposed by the relative power theory.
 As \citet{Verba1995} explain, participation in politics places demands on individuals' time and money.  Participating in politics, and especially in campaigns, is like any other normal good in this view: those with more money and time will consume more of it than those with less \citep{Ansolabehere2003}.
-Coupled with the facts that higher inequality by definition means that more money is concentrated in fewer hands and that those with more money are better able to afford the cost of time spent not working, the focus on resources yields the hypothesis that greater inequality will result in \emph{more} participation by the relatively affluent and less participation only among the relatively poor.
-\footnote{\doublespacing Yet a third theoretical perspective contends that the more divergent material conditions of richer and poorer citizens in contexts of higher inequality will spark more contentious---and therefore more interesting---politics and so coincide with greater rates of participation across all income levels \citep[see][]{Brady2004}.  
+Coupled with the facts that higher inequality by definition means that more money is concentrated in fewer hands and that those with more money are better able to afford the cost of time spent not working, the focus on resources yields the hypothesis that greater inequality will result in \emph{more} participation by the relatively affluent and less participation only among the relatively poor.\footnote{\doublespacing Yet a third theoretical perspective contends that the more divergent material conditions of richer and poorer citizens in contexts of higher inequality will spark more contentious---and therefore more interesting---politics and so coincide with greater rates of participation across all income levels \citep[see][]{Brady2004}.  
 This conflict theory, however, has not received much empirical support in prior research.  
 We therefore focus our discussion here on the predictions of the relative power and resource theories.}
 
@@ -109,53 +113,145 @@ The data we use and the method we employ to analyze them are described in the ne
 
 \section*{Data and Method}
 
-<<label=setup, echo=FALSE, results=hide>>==
-library(foreign)
-library(ggplot2)
-library(plyr)
-library(reshape2)
-library(car)
+<<label=setup>>==
+# library(checkpoint)
+# checkpoint("2016-12-10")
 
-study.dir <- "~/Documents/Projects/Workflow/Michael/Campaign3/"
-cces <- read.dta(paste0(study.dir, "cces_short.dta"), convert.factors=F)
-cces0 <- cces
-cces1 <- cces0[complete.cases(cces0), ]
-ivs <- c("gini_st1", "gdppc", "div_st", "inits_st", "gov_st", "sen_st", "sw_mar",
-         "age", "educated", "rep", "dem", "black", "hisp",
-         "male", "married", "children", "church", "unionmem", "income")
-cces <- cces[, ivs]
-cces <- cces[complete.cases(cces), ]
-ivs <- c("constant", ivs, "giniXincome")
+library(tidyverse)
+library(broom)
+library(mi)
+library(mitools)
+library(lme4)
+library(dotwhisker)
+library(interplot)
 
 @
 
-<<label=summary, echo=FALSE, results=hide>>==
-cp.state <- ddply(cces0, .(state), summarize,
-                  postal = StateAbbr[1],
-                  donate = round(weighted.mean(donate, V103)*100),
-                  meet = round(weighted.mean(meetings, V103)*100),
-                  work = round(weighted.mean(polwork, V103)*100),
-                  gini = round(mean(gini_st1), 1),
-                  wt = sum(V103))
+<<label=data>>==
+# To replicate, one must first download CCES12_Common_VV.RData from hdl:1902.1/21447
 
-cp.state$wt <- cp.state$wt/max(cp.state$wt)
+# Load data
+load("../data-raw/CCES12_Common_VV.RData")
+state_vars <- read_csv("../data-raw/state_vars.csv") %>% as.data.frame()
 
-cp.cor <- data.frame(variable = c("Make Donation", "Attend Meetings", "Work for Campaign"))
-cp.cor$variable <- as.character(cp.cor$variable)
-cp.cor$r <- NA
-cp.cor$ypos <- NA
-
-for (i in 1:3) {
-  cp.cor$r[i] <- paste0("R = -", formatC(round((summary(lm(cp.state[, i+2] ~ cp.state$gini, weights = cp.state$wt))$r.squared)^.5, 2), format = 'f', digits = 2))
-  cp.cor$ypos[i] <- .98*max(cp.state[, i+2])
+# Format data
+range_midpoint <- function(x) {
+  x %>%
+    as.numeric() %>% 
+    recode(`1` = .5,
+           `2` = 1.5,
+           `3` = 2.5,
+           `4` = 3.5,
+           `5` = 4.5,
+           `6` = 5.5,
+           `7` = 6.5,
+           `8` = 7.5,
+           `9` = 9.0,
+           `10` = 11.0,
+           `11` = 13.5,
+           `12` = 17.5,
+           `13` = 22.5,
+           `14` = 30.0,
+           `15` = 42.5,
+           `16` = 50.0,
+           `18` = 25.0,
+           `19` = NA_real_)
 }
 
-cp.st1 <- melt(cp.state, id.vars=c("state", "postal", "gini", "wt"))
+cces <- x %>% 
+  filter(inputstate != "District of Columbia") %>% 
+  transmute(., id = 1:nrow(.),
+            age = 2012 - as.numeric(as.character(birthyr)),
+            educated = as.numeric(educ),
+            inc_abs = range_midpoint(faminc),
+            dem = as.numeric(pid3 == "Democrat"),
+            rep = as.numeric(pid3 == "Republican"),
+            black = as.numeric(race == "Black"),
+            hisp = as.numeric(race == "Hispanic"),
+            male = as.numeric(gender == "Male"),
+            married = as.numeric(CC303_1 == "Yes"),
+            children = if_else(child18 == "Yes",
+                               if_else(as.numeric(child18numx) < 5, as.numeric(child18numx), 5),
+                               0),
+            church = if_else(pew_churatd != "Don't know",
+                             6 - as.numeric(pew_churatd),
+                             NA_real_),
+            union = as.numeric(as.numeric(union) == 1),
+            homeowner = as.numeric(ownhome == "Own"),
+            resident = if_else(CC351 <= "7 to 11 months",
+                               0,
+                               as.numeric(CC351) - 3),
+            donate = as.numeric(CC417a_4 == "Yes"),
+            meetings = as.numeric(CC417a_1 == "Yes"),
+            polwork = as.numeric(CC417a_3 == "Yes"),
+            state_alpha = as.numeric(inputstate),
+            state_alpha = if_else(state_alpha > 9, state_alpha - 1, state_alpha), # get rid of gap from DC
+            state_abb = as.character(StateAbbr))  
+  
+cces <- left_join(cces, state_vars, by = "state_alpha") %>% as.data.frame()
+median_gini_st <- median(cces$gini_st)
 
-levels(cp.st1$variable)[levels(cp.st1$variable)=="donate"] <- "Make Donation"
-levels(cp.st1$variable)[levels(cp.st1$variable)=="meet"]   <- "Attend Meetings"
-levels(cp.st1$variable)[levels(cp.st1$variable)=="work"]   <- "Work for Campaign"        
+# Impute missing data
+mdf <- missing_data.frame(cces)
+mdf <- change(mdf, y = "inc_abs", what = "type", to = "bounded-continuous", lower=.5, upper=50)
+mdf <- change(mdf, y = "church", what = "type", to = "ordered-categorical")
+mdf <- change(mdf, y = c("state_alpha", "state_abb", "state"), what = "type", to = "irrelevant")
+options(mc.cores = 4)
+mdf_mi <- mi(mdf, seed=324) 
 
+# switch to mitools format (no support for glmer in mi::pool)
+mdf_mi_list <- mi::complete(mdf_mi, m=10) 
+mdf_mi_list <- lapply(mdf_mi_list, function(df) {
+  df <- sapply(df, function(v) 
+    if(any(class(v)=="factor")) v <- as.numeric(levels(v))[v] else v <- v) %>% # get rid of %&*(&^ factors
+    data.frame() %>% 
+    group_by(state_alpha) %>%
+    arrange(id) %>% 
+    mutate(inc_rel = ntile(inc_abs, 5) - 3,
+           gini_st = gini_st - median_gini_st) %>%
+    ungroup() %>%
+    data.frame()
+  return(df)
+})
+mdf_mi_list <- imputationList(mdf_mi_list)
+@
+
+<<label=summary>>==
+cp_state <- cces %>% 
+  group_by(state_alpha) %>% 
+  summarize(postal = first(state_abb),
+            donate = round(mean(donate, na.rm = TRUE)*100),
+            meet = round(mean(meetings, na.rm = TRUE)*100),
+            work = round(mean(polwork, na.rm = TRUE)*100),
+            gini = round(first(gini_st), 3)) 
+  
+dvs <- c("donate", "meet", "work")
+dv_labs <- c("Make Donation", "Attend Meetings", "Work for Campaign")
+
+cp_cor <- data_frame(variable = as.factor(dvs))
+levels(cp_cor$variable)[levels(cp_cor$variable)=="donate"] <- "Make Donation"
+levels(cp_cor$variable)[levels(cp_cor$variable)=="meet"]   <- "Attend Meetings"
+levels(cp_cor$variable)[levels(cp_cor$variable)=="work"]   <- "Work for Campaign"   
+
+cp_cor$r <- cp_state %>% 
+  dplyr::select(one_of(dvs)) %>%
+  map(~ lm(cp_state$gini ~ .x, data = cp_state)) %>% 
+  map(summary) %>% 
+  map_dbl("r.squared") 
+
+cp_cor <- cp_cor %>% 
+  mutate(r = paste0("R = -", round(r, digits = 3)))
+
+cp_cor$ypos <- cp_state %>% 
+  dplyr::select(one_of(dvs)) %>%
+  map_dbl(~ 1.02*max(.x))
+
+cp_st1 <- gather(cp_state, key = variable, value = value, one_of(dvs))
+
+cp_st1$variable <- as.factor(cp_st1$variable)
+levels(cp_st1$variable)[levels(cp_st1$variable)=="donate"] <- "Make Donation"
+levels(cp_st1$variable)[levels(cp_st1$variable)=="meet"]   <- "Attend Meetings"
+levels(cp_st1$variable)[levels(cp_st1$variable)=="work"]   <- "Work for Campaign" 
 @
 
 
@@ -165,53 +261,40 @@ The 2012 survey was conducted in two waves, the first during the month before th
 The CCES asked respondents whether in the past year they had (1) donated money to a candidate, campaign, or political organization; (2) attended a local political meeting; or (3) worked for a candidate or campaign.
 Following previous research \citep[see, e.g.,][125-127]{Schlozman2012}, we use these three items to measure campaign participation, but to allow for variation across these different activities, we analyze each of these items as a separate dichotomous variable rather than combining them into a single index or scale.
 
-% There was considerable variation in participation in these campaign activities across states.  According to weighted data from the CCES, \Sexpr{max(cp.state$donate)}\% of residents of \Sexpr{cp.state$state[which(cp.state$donate==max(cp.state$donate))]} made political donations, but only \Sexpr{min(cp.state$donate)}\% of those living in \Sexpr{cp.state$state[which(cp.state$donate==min(cp.state$donate))]} donated.  In \Sexpr{cp.state$state[which(cp.state$meet==max(cp.state$meet))]}, \Sexpr{max(cp.state$meet)}\% reported attending a political meeting, while in \Sexpr{cp.state$state[which(cp.state$meet==min(cp.state$meet))]} only \Sexpr{min(cp.state$meet)}\% did.  North Dakotan respondents also reported the highest rate of working for political campaigns, \Sexpr{max(cp.state$work)}\%
-% In \Sexpr{cp.state$state[which(cp.state$work==max(cp.state$work))]}
-% \Sexpr{min(cp.state$work)}\% 
-% \Sexpr{cp.state$state[which(cp.state$work==min(cp.state$work))]}
-
-%The survey has been criticized as being unrepresentative of that nation as a whole because the survey is online, and because it consists of self-reported data. The survey is weighted by state to account for the possible unrepresentativeness of the survey, so the survey is representative across all the American states. The self-reported nature of the data mainly employed in this study is admittedly a limitation, but one which is outweighed by the large number of representative observations derived from this survey for the purposes of my study.
-
-The primary independent variable, economic inequality, was measured using data from the U.S. Census Bureau's 2011 American Community Survey, specifically the Gini index of household income inequality for each state \citep[5]{Noss2012}.
-\footnote{\doublespacing The Census Bureau's measure of income includes that gained from market sources, private transfers, and government transfers; it regrettably does not take taxes into account.
+The primary independent variable, economic inequality, was measured using data from the U.S. Census Bureau's 2011 American Community Survey, specifically the Gini coefficient of household income inequality for each state \citep[5]{Noss2012}.\footnote{\doublespacing The Census Bureau's measure of income includes that gained from market sources, private transfers, and government transfers; it regrettably does not take taxes into account.
 Following previous scholarship, it is used here because it remains the best data currently available on inequality at the state level \citep[see, e.g.,][]{Solt2010, Kelly2012}.}
-The Gini index has a theoretical range of 0, if every household receives the same income, to 100, if one household receives all of the income and the rest receive none.
+The Gini coefficient has a theoretical range of 0, if every household receives the same income, to 1, if one household receives all of the income and the rest receive none.
 Although income inequality is high and has risen across all of the states over the past few decades, there is still considerable variation.
-In the least unequal state by this measure, \Sexpr{cp.state$state[which(cp.state$gini==min(cp.state$gini))]}, the Gini index was \Sexpr{min(cp.state$gini)}.
-On the other hand, \Sexpr{cp.state$state[which(cp.state$gini==max(cp.state$gini))]} was the most unequal state, with a Gini index of \Sexpr{max(cp.state$gini)}.
-Arizona and Pennsylvania flanked the median Gini index of the states, \Sexpr{median(cp.state$gini)}.
+%In the least unequal state by this measure, \Sexpr{state_vars$state[which(cp.state$gini==min(cp.state$gini))]}, the Gini coefficient was \Sexpr{min(cp.state$gini)}.
+%On the other hand, \Sexpr{cp.state$state[which(cp.state$gini==max(cp.state$gini))]} was the most unequal state, with a Gini index of \Sexpr{max(cp.state$gini)}.
+%Arizona and Pennsylvania flanked the median Gini index of the states, \Sexpr{median(cp.state$gini)}.
 
-<<label=scatter_plot, echo=F, fig=T, include=F, width = 12, height = 5>>==
-ggplot(data = cp.st1, aes(y = value, x = gini, label=postal)) +
-  geom_text(aes(alpha=wt^.2)) + 
+<<label=scatter, fig.show="hide">>==
+ggplot(data = cp_st1, aes(y = value, x = gini, label = postal)) +
+  geom_text() + 
   facet_wrap(~ variable, scales = "free") +
   theme_bw() +
-  geom_text(data=cp.cor, aes(x=49, y=ypos, label=r), 
+  geom_text(data = cp_cor, aes(x = .49, y = ypos, label = r), 
                     colour="black", inherit.aes=FALSE, parse=FALSE) +
   theme(legend.position="none", strip.text.x = element_text(size=12, face="bold"),
         strip.background = element_rect(colour="white", fill="white")) +
   ylab("") +
   xlab("Income Inequality") +
-  scale_x_continuous(limits=c(39.2, 50.8), breaks=seq(40, 50, 2))
+  scale_x_continuous(limits=c(.392, .508), breaks=seq(.40, .50, .02))
+ggsave("figures/scatter.pdf", width = 12, height = 5)
 @
 
 \begin{figure}[!htbp] 
   \caption{Income Inequality and Campaign Participation By State}
   \label{F:scatter}
   \begin{center}
-    \includegraphics[width=6in]{CP1-scatter_plot.pdf}
+    \includegraphics[width=6in]{figures/scatter.pdf}
   \end{center}
-  \begin{footnotesize}
-  \begin{tabular}{p{.2in} p{5.8in}}
-  & \emph{Note}: States are shaded to depict the sum of the weights of their individual-level observations; states with fewer effective observations are lighter.  Weighted bivariate correlations are shown.
-  \end{tabular}
-  \end{footnotesize}
 \end{figure}
 
 Figure~\ref{F:scatter} depicts the bivariate relationships between income inequality and the three measures of campaign participation examined here.
 Two points stand out.
-First, there is considerable variation in campaign participation (as well as in income inequality) across the states.
-\footnote{It is perhaps worth underscoring that variation across states undercuts any claim that `all politics is national.' 
+First, there is considerable variation in campaign participation (as well as in income inequality) across the states.\footnote{It is perhaps worth underscoring that variation across states undercuts any claim that `all politics is national.' 
 That people in different states participate at different rates suggests either that the extent to which the issues and debates of politics motivate people to participate or the extent to which people are capable of participating varies across states.
 Whether these differences in participation are consistent with arguments that levels of inequality shape the former, as the relative power theory contends, or the latter, as the resource theory would have it, is an empirical question.}
 
@@ -225,14 +308,13 @@ Because the same income falls in different positions of the income distribution 
 While an annual family income of \$80,000 was sufficient to reach the richest quintile in Arkansas or Mississippi, for example, at least \$120,000 was needed in New Jersey or Virginia.
 To facilitate interpretation, the variable was centered so that 0 represents the median quintile, -2 the poorest quintile, and 2 the richest quintile. 
 
-The CCES also provides data on many other individual-level characteristics well understood to be associated with at least some forms of political participation: age, education, partisan identification, race and ethnicity, gender, marital status, number of children, frequency of church attendance, and union membership.
-\footnote{\doublespacing Two other variables common in the literature on voting, home ownership and length of residence, were found not to be strongly associated with campaign participation, and their inclusion does not affect our conclusions.}
+The CCES also provides data on many other individual-level characteristics well understood to be associated with at least some forms of political participation: age, education, partisan identification, race and ethnicity, gender, marital status, number of children, frequency of church attendance, and union membership.\footnote{\doublespacing Two other variables common in the literature on voting, home ownership and length of residence, were found not to be strongly associated with campaign participation, and their inclusion does not affect our conclusions.}
 We include these variables as controls in our analysis.  
 
 There are also aspects of state context that have been found to be associated with various forms of political participation that are important to consider here.
 The extent of racial and ethnic diversity in the state has been found to depress political participation \citep[see, e.g.,][]{Hill1999}.
-As economic inequality and ethnic diversity are positively related across the states ($R = $ \Sexpr{round(cor(cces$gini_st1, cces$div_st), 2)}), including diversity as a control is necessary to avoid omitted-variable bias.
-Whether a state is, on average, wealthier or poorer may also be important, and as richer states tend to be slightly more unequal than poorer ones ($R = $ \Sexpr{round(cor(cces$gini_st1, cces$gdppc), 2)}), we include state gross domestic product per capita as a control as well.
+%As economic inequality and ethnic diversity are positively related across the states ($R = $ \Sexpr{round(cor(cces$gini_st1, cces$div_st), 2)}), including diversity as a control is necessary to avoid omitted-variable bias.
+%Whether a state is, on average, wealthier or poorer may also be important, and as richer states tend to be slightly more unequal than poorer ones ($R = $ \Sexpr{round(cor(cces$gini_st1, cces$gdppc), 2)}), we include state gross domestic product per capita as a control as well.
 The campaign setting itself is also likely to affect participation.
 The presence on the ballot of a high-profile statewide race in addition to the presidential contest can reasonably be hypothesized to increase the chances that people participated in the campaign.
 We include separate indicators for the states that held a concurrent gubernatorial election and for the states that elected senators in 2012.
@@ -278,167 +360,183 @@ The resource theory contends that poorer people will become less likely to parti
 
 \section*{Analysis and Results}
 
-<<echo=F, results=hide>>==
-importHLM <- function(file = NULL) {
-  varcov <- read.table(file)
-  
-  b <- as.vector(varcov[1,], mode="double")
-  varcov <- as.matrix(varcov[-1,])
-  
-  se <- diag(chol(diag(diag(varcov), length(diag(varcov)))))
-  no <- 1:length(b)
-  
-  results <- data.frame(no, b, se)
-  
-  return(results)
+<<label=m1>>==
+format_mi_results <- function(m) {
+  # format results of glmer analysis of multiply imputed dataset
+  m_fe <- MIextract(m, fun=fixef) # see https://books.google.com/books?id=EbLrQrBGid8C&pg=PA384
+  m_vars <- MIextract(m, fun=vcov)
+  m_vars2 <- list()
+  m_vars2 <- lapply(m_vars, as.matrix)
+  m_res <- MIcombine(m_fe, m_vars2)
+  b <- m_res$coefficients
+  se <- diag(m_res$variance^.5)
+  df <- data.frame(term = names(b),
+                   estimate = b,
+                   std.error = se,
+                   model = deparse(substitute(m)), 
+                   stringsAsFactors = FALSE)
+  df %>% filter(term!="(Intercept)")
 }
 
-simsHLM <- function(file = NULL, n = 10000, seed = 324) {
-  # H/T http://www.quantumforest.com/2011/10/simulating-data-following-a-given-covariance-structure/
-  varcov <- read.table(file)
-  
-  betas <- as.vector(varcov[1,])
-  varcov <- as.matrix(varcov[-1,])
-  se <- diag(chol(diag(diag(varcov), length(diag(varcov)))))
-  
-  L <- chol(varcov)
-  n.vars <- dim(L)[1]
+m1 <- with(mdf_mi_list, 
+           glmer(formula = donate ~ gini_st + inc_rel + gini_st:inc_rel +
+                   gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
+                   inc_abs + age + educated + rep + dem + black + hisp + 
+                   male + married + children + church + union +
+                   (1 + inc_rel|state_alpha), family=binomial(link="logit")))
 
-  set.seed(seed)
-  sims <- t(t(L) %*% matrix(rnorm(n.vars*n), nrow=n.vars, ncol=n))
-  
-  for (v in 1:ncol(sims)) {
-    sims[,v] <- sims[,v] + as.numeric(betas[v])
-  }
-  
-  sims <- as.data.frame(sims)
-  names(sims) <- ivs
-  return(sims)
-}
+m1_res <- format_mi_results(m1)
+@
 
+<<label=m2>>==
+m2 <- with(mdf_mi_list, 
+           glmer(formula = meetings ~ gini_st + inc_rel + gini_st:inc_rel +
+                   gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
+                   inc_abs + age + educated + rep + dem + black + hisp + 
+                   male + married + children + church + union +
+                   (1 + inc_rel|state_alpha), family=binomial(link="logit")))
+
+m2_res <- format_mi_results(m2)
+@
+
+<<label=m3>>==
+m3 <- with(mdf_mi_list, 
+           glmer(formula = polwork ~ gini_st + inc_rel + gini_st:inc_rel +
+                   gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
+                   inc_abs + age + educated + rep + dem + black + hisp + 
+                   male + married + children + church + union +
+                   (1 + inc_rel|state_alpha), family=binomial(link="logit")))
+
+m3_res <- format_mi_results(m3)
+@
+
+<<label=old>>==
 # Regression Results Graph Prep
-donate.reg <- importHLM(file=paste0(study.dir,"donate/gamvcpar.dat"))
-meetings.reg <- importHLM(file=paste0(study.dir,"meetings/gamvcpar.dat"))
-polwork.reg <- importHLM(file=paste0(study.dir,"polwork/gamvcpar.dat"))
-
-donate.sims <- simsHLM(file=paste0(study.dir,"donate/gamvcpar.dat"))
-meetings.sims <- simsHLM(file=paste0(study.dir,"meetings/gamvcpar.dat"))
-polwork.sims <- simsHLM(file=paste0(study.dir,"polwork/gamvcpar.dat"))
-
-donate.sims$dv <- "Make Donation"
-meetings.sims$dv <- "Attend Meetings"
-polwork.sims$dv <- "Work for Campaign"
-
-sims <- rbind(donate.sims, meetings.sims, polwork.sims)
-
-var <- c("Intercept", "Income Inequality", "GDP/Capita", "Ethnic Diversity", 
-         "Ballot Initiatives", "Gubernatorial Race", "Senatorial Race",
-         "Margin, Statewide Races", "Age", "Education",
-         "Republican", "Democrat", "African-American", "Latino", "Male", 
-         "Married", "Children", "Church Attendance", "Union Member",
-         "Income Quintile", "Inequality*Income Quintile")
-
-sds <- apply(cces, 2, function(x) sd(x, na.rm=T)) 
-sds <- c(1, sds, sds[1]*sds[length(sds)])
-dich.ivs <- c("gov_st", "sen_st", "rep", "dem", "black", "hisp", "male", "married", "unionmem")
-sds[dich.ivs] <- .5
-
-donate.reg <- cbind(donate.reg, var, ivs, sds)
-donate.reg$dv <- "Make Donation"
-meetings.reg <- cbind(meetings.reg, var, ivs, sds)
-meetings.reg$dv <- "Attend Meetings"
-polwork.reg <- cbind(polwork.reg, var, ivs, sds)
-polwork.reg$dv <- "Work for Campaign"
-
-ineq.median <- quantile(cces$gini_st1, prob=.5)
-
-donate.reg$b[donate.reg$ivs=="income"] <- mean(donate.sims$income + ineq.median * donate.sims$giniXincome)
-donate.reg$se[donate.reg$ivs=="income"] <- sd(donate.sims$income + ineq.median * donate.sims$giniXincome)
-
-meetings.reg$b[meetings.reg$ivs=="income"] <- mean(meetings.sims$income + ineq.median * meetings.sims$giniXincome)
-meetings.reg$se[meetings.reg$ivs=="income"] <- sd(meetings.sims$income + ineq.median * meetings.sims$giniXincome)
-
-polwork.reg$b[polwork.reg$ivs=="income"] <- mean(polwork.sims$income + ineq.median * polwork.sims$giniXincome)
-polwork.reg$se[polwork.reg$ivs=="income"] <- sd(polwork.sims$income + ineq.median * polwork.sims$giniXincome)
-
-reg.results <- rbind(donate.reg[-1,], meetings.reg[-1,], polwork.reg[-1,])
-reg.results$dv <- factor(reg.results$dv, levels=c("Make Donation", "Attend Meetings", "Work for Campaign"))
-reg.results$b <- with(reg.results, b*2*sds) 
-reg.results$se <- with(reg.results, se*2*sds) 
-reg.results$lb <- with(reg.results, b - 1.96*se) 
-reg.results$ub <- with(reg.results, b + 1.96*se)
-reg.results$no[reg.results$no>=3] <- reg.results$no[reg.results$no>=3] + 1
-reg.results$no[reg.results$var=="Income Inequality"] <- 1
-reg.results$no[reg.results$var=="Inequality*Income Quintile"] <- 2
-reg.results$no[reg.results$var=="Income Quintile"] <- 3
-reg.results$no[reg.results$var=="Ethnic Diversity"] <- 4
-reg.results$no[reg.results$var=="GDP/Capita"] <- 5
-reg.results <- reg.results[with(reg.results, order(dv, no)), ]
-
-offset <- .2
-reg.results$no[reg.results$dv=="Make Donation"] <- reg.results$no[reg.results$dv=="Make Donation"] - offset
-reg.results$no[reg.results$dv=="Work for Campaign"] <- reg.results$no[reg.results$dv=="Work for Campaign"] + offset
-
-n.vars <- length(donate.reg$var)-1
-
-
-# Inequality Coefficients Graph Prep
-coef1 <- data.frame(coef = with(sims, gini_st1 + giniXincome * -2), dv = sims$dv)
-coef2 <- data.frame(coef = with(sims, gini_st1 + giniXincome * -1), dv = sims$dv)
-coef3 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 0), dv = sims$dv)
-coef4 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 1), dv = sims$dv)
-coef5 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 2), dv = sims$dv)
-
-coef1$quintile <- "Poorest Quintile"
-coef2$quintile <- "Second Quintile"
-coef3$quintile <- "Median Quintile"
-coef4$quintile <- "Fourth Quintile"
-coef5$quintile <- "Richest Quintile"
-
-coefs <- rbind(coef1, coef2, coef3, coef4, coef5)
-
-coefs.sum <- ddply(coefs, .(dv, quintile), summarize, 
-                   b = mean(coef),
-                   ub = quantile(coef, 0.975),
-                   lb = quantile(coef, 0.025))
-
-coefs.sum$quintile <- factor(coefs.sum$quintile, levels=c("Poorest Quintile", 
-                                                          "Second Quintile", 
-                                                          "Median Quintile", 
-                                                          "Fourth Quintile", 
-                                                          "Richest Quintile"))
-
-coefs.sum$dv <- factor(coefs.sum$dv, levels=c("Make Donation", "Attend Meetings", "Work for Campaign"))
-
-coefs.sum.unstd <- coefs.sum
-
-coefs.sum[3:5] <- coefs.sum[3:5] * sds[1] * 2
-
-pd <- position_dodge(.25)
+# donate.reg <- importHLM(file=paste0(study.dir,"donate/gamvcpar.dat"))
+# meetings.reg <- importHLM(file=paste0(study.dir,"meetings/gamvcpar.dat"))
+# polwork.reg <- importHLM(file=paste0(study.dir,"polwork/gamvcpar.dat"))
+# 
+# donate.sims <- simsHLM(file=paste0(study.dir,"donate/gamvcpar.dat"))
+# meetings.sims <- simsHLM(file=paste0(study.dir,"meetings/gamvcpar.dat"))
+# polwork.sims <- simsHLM(file=paste0(study.dir,"polwork/gamvcpar.dat"))
+# 
+# donate.sims$dv <- "Make Donation"
+# meetings.sims$dv <- "Attend Meetings"
+# polwork.sims$dv <- "Work for Campaign"
+# 
+# sims <- rbind(donate.sims, meetings.sims, polwork.sims)
+# 
+# var <- c("Intercept", "Income Inequality", "GDP/Capita", "Ethnic Diversity", 
+#          "Ballot Initiatives", "Gubernatorial Race", "Senatorial Race",
+#          "Margin, Statewide Races", "Age", "Education",
+#          "Republican", "Democrat", "African-American", "Latino", "Male", 
+#          "Married", "Children", "Church Attendance", "Union Member",
+#          "Income Quintile", "Inequality*Income Quintile")
+# 
+# sds <- apply(cces, 2, function(x) sd(x, na.rm=T)) 
+# sds <- c(1, sds, sds[1]*sds[length(sds)])
+# dich.ivs <- c("gov_st", "sen_st", "rep", "dem", "black", "hisp", "male", "married", "unionmem")
+# sds[dich.ivs] <- .5
+# 
+# donate.reg <- cbind(donate.reg, var, ivs, sds)
+# donate.reg$dv <- "Make Donation"
+# meetings.reg <- cbind(meetings.reg, var, ivs, sds)
+# meetings.reg$dv <- "Attend Meetings"
+# polwork.reg <- cbind(polwork.reg, var, ivs, sds)
+# polwork.reg$dv <- "Work for Campaign"
+# 
+# ineq.median <- quantile(cces$gini_st1, prob=.5)
+# 
+# donate.reg$b[donate.reg$ivs=="income"] <- mean(donate.sims$income + ineq.median * donate.sims$giniXincome)
+# donate.reg$se[donate.reg$ivs=="income"] <- sd(donate.sims$income + ineq.median * donate.sims$giniXincome)
+# 
+# meetings.reg$b[meetings.reg$ivs=="income"] <- mean(meetings.sims$income + ineq.median * meetings.sims$giniXincome)
+# meetings.reg$se[meetings.reg$ivs=="income"] <- sd(meetings.sims$income + ineq.median * meetings.sims$giniXincome)
+# 
+# polwork.reg$b[polwork.reg$ivs=="income"] <- mean(polwork.sims$income + ineq.median * polwork.sims$giniXincome)
+# polwork.reg$se[polwork.reg$ivs=="income"] <- sd(polwork.sims$income + ineq.median * polwork.sims$giniXincome)
+# 
+# reg.results <- rbind(donate.reg[-1,], meetings.reg[-1,], polwork.reg[-1,])
+# reg.results$dv <- factor(reg.results$dv, levels=c("Make Donation", "Attend Meetings", "Work for Campaign"))
+# reg.results$b <- with(reg.results, b*2*sds) 
+# reg.results$se <- with(reg.results, se*2*sds) 
+# reg.results$lb <- with(reg.results, b - 1.96*se) 
+# reg.results$ub <- with(reg.results, b + 1.96*se)
+# reg.results$no[reg.results$no>=3] <- reg.results$no[reg.results$no>=3] + 1
+# reg.results$no[reg.results$var=="Income Inequality"] <- 1
+# reg.results$no[reg.results$var=="Inequality*Income Quintile"] <- 2
+# reg.results$no[reg.results$var=="Income Quintile"] <- 3
+# reg.results$no[reg.results$var=="Ethnic Diversity"] <- 4
+# reg.results$no[reg.results$var=="GDP/Capita"] <- 5
+# reg.results <- reg.results[with(reg.results, order(dv, no)), ]
+# 
+# offset <- .2
+# reg.results$no[reg.results$dv=="Make Donation"] <- reg.results$no[reg.results$dv=="Make Donation"] - offset
+# reg.results$no[reg.results$dv=="Work for Campaign"] <- reg.results$no[reg.results$dv=="Work for Campaign"] + offset
+# 
+# n.vars <- length(donate.reg$var)-1
+# 
+# 
+# # Inequality Coefficients Graph Prep
+# coef1 <- data.frame(coef = with(sims, gini_st1 + giniXincome * -2), dv = sims$dv)
+# coef2 <- data.frame(coef = with(sims, gini_st1 + giniXincome * -1), dv = sims$dv)
+# coef3 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 0), dv = sims$dv)
+# coef4 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 1), dv = sims$dv)
+# coef5 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 2), dv = sims$dv)
+# 
+# coef1$quintile <- "Poorest Quintile"
+# coef2$quintile <- "Second Quintile"
+# coef3$quintile <- "Median Quintile"
+# coef4$quintile <- "Fourth Quintile"
+# coef5$quintile <- "Richest Quintile"
+# 
+# coefs <- rbind(coef1, coef2, coef3, coef4, coef5)
+# 
+# coefs.sum <- ddply(coefs, .(dv, quintile), summarize, 
+#                    b = mean(coef),
+#                    ub = quantile(coef, 0.975),
+#                    lb = quantile(coef, 0.025))
+# 
+# coefs.sum$quintile <- factor(coefs.sum$quintile, levels=c("Poorest Quintile", 
+#                                                           "Second Quintile", 
+#                                                           "Median Quintile", 
+#                                                           "Fourth Quintile", 
+#                                                           "Richest Quintile"))
+# 
+# coefs.sum$dv <- factor(coefs.sum$dv, levels=c("Make Donation", "Attend Meetings", "Work for Campaign"))
+# 
+# coefs.sum.unstd <- coefs.sum
+# 
+# coefs.sum[3:5] <- coefs.sum[3:5] * sds[1] * 2
+# 
+# pd <- position_dodge(.25)
 @
 
-<<label=reg_plot, echo=F, fig=T, include=F, width = 9, height = 6>>=
-ggplot(data = reg.results, aes(y = no, x = b, colour=dv)) +
-  geom_point() + geom_errorbarh(aes(xmin = lb, xmax = ub, height=0)) +
-  ylab("") + xlab("") + theme_bw() + 
-  scale_colour_manual(values = c("red","black", "blue")) +
-  scale_y_reverse(breaks = 1:n.vars, labels = reg.results[1:n.vars,"var"]) +
-  theme(legend.title=element_blank(), legend.position=c(.875, .1)) +
-  geom_vline(xintercept=c(0), linetype="dotted")
+<<label=reg_plot>>=
+# , echo=F, fig=T, include=F, width = 9, height = 6
+# ggplot(data = reg.results, aes(y = no, x = b, colour=dv)) +
+#   geom_point() + geom_errorbarh(aes(xmin = lb, xmax = ub, height=0)) +
+#   ylab("") + xlab("") + theme_bw() + 
+#   scale_colour_manual(values = c("red","black", "blue")) +
+#   scale_y_reverse(breaks = 1:n.vars, labels = reg.results[1:n.vars,"var"]) +
+#   theme(legend.title=element_blank(), legend.position=c(.875, .1)) +
+#   geom_vline(xintercept=c(0), linetype="dotted")
 @
 
-<<label=coef_plot, echo=F, fig=T, include=F, width = 9, height = 6>>=
-ggplot(data = coefs.sum, aes(x = quintile, y = b, colour = dv)) +
-  geom_point(position = pd) + 
-  geom_errorbar(aes(ymin = lb, ymax = ub, width = 0), position=pd) +
-  ylab("Standardized Coefficient for Inequality") + xlab("") + theme_bw() + 
-  scale_colour_manual(values = c("red","black", "blue")) +
-  theme(legend.title=element_blank(), legend.position=c(.1, .9)) +
-  geom_hline(yintercept=c(0), linetype="dotted")
+<<label=coef_plot>>=
+# , echo=F, fig=T, include=F, width = 9, height = 6
+# ggplot(data = coefs.sum, aes(x = quintile, y = b, colour = dv)) +
+#   geom_point(position = pd) + 
+#   geom_errorbar(aes(ymin = lb, ymax = ub, width = 0), position=pd) +
+#   ylab("Standardized Coefficient for Inequality") + xlab("") + theme_bw() + 
+#   scale_colour_manual(values = c("red","black", "blue")) +
+#   theme(legend.title=element_blank(), legend.position=c(.1, .9)) +
+#   geom_hline(yintercept=c(0), linetype="dotted")
 
 @
 
-<<echo=F, results=hide>>==
+<<label=p>>==
+#echo=F, results=hide
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   require(grid)
   
@@ -529,50 +627,51 @@ pp.data <- function(dv = NULL) {
   return(pp)
 }
 
-pp.donate <- pp.data("donate")
-pp.meetings <- pp.data("meetings")
-pp.polwork <- pp.data("polwork")
-
-pp.donate.plot <- ggplot(pp.donate, aes(x = gini_st1, y = est, group = income)) + 
-  geom_line(aes(colour = income)) + 
-  geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
-  xlab("") + ylab("") +
-  theme_bw() + theme(legend.position="none") +
-  ggtitle("Make Donation") + theme(plot.title = element_text(face="bold")) +
-  geom_text(aes(44, 39, label="Richest Quintile", color="2")) +
-  geom_text(aes(43, 9, label="Poorest Quintile", color="-2")) +
-  scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
-  scale_colour_manual(values = c("red", "blue")) +
-  scale_fill_manual(values = c("red", "blue"))
-
-pp.meetings.plot <- ggplot(pp.meetings, aes(x = gini_st1, y = est, group = income)) + 
-  geom_line(aes(colour = income)) + 
-  geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
-  xlab("Income Inequality") + ylab("") +
-  theme_bw() + theme(legend.position="none") +
-  ggtitle("Attend Meetings") + theme(plot.title = element_text(face="bold")) +
-  geom_text(aes(44, 18.7, label="Richest Quintile", color="2")) +
-  geom_text(aes(43, 7, label="Poorest Quintile", color="-2")) +
-  scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
-  scale_colour_manual(values = c("red", "blue")) +
-  scale_fill_manual(values = c("red", "blue"))
-
-pp.polwork.plot <- ggplot(pp.polwork, aes(x = gini_st1, y = est, group = income)) + 
-  geom_line(aes(colour = income)) + 
-  geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
-  xlab("") + ylab("") +
-  theme_bw() + theme(legend.position="none") +
-  ggtitle("Work for Campaign") + theme(plot.title = element_text(face="bold")) +
-  geom_text(aes(45, 8, label="Richest Quintile", color="2")) +
-  geom_text(aes(43, 3.8, label="Poorest Quintile", color="-2")) +
-  scale_y_continuous(limits=c(2, 10)) +
-  scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
-  scale_colour_manual(values = c("red", "blue")) +
-  scale_fill_manual(values = c("red", "blue"))
+# pp.donate <- pp.data("donate")
+# pp.meetings <- pp.data("meetings")
+# pp.polwork <- pp.data("polwork")
+# 
+# pp.donate.plot <- ggplot(pp.donate, aes(x = gini_st1, y = est, group = income)) + 
+#   geom_line(aes(colour = income)) + 
+#   geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
+#   xlab("") + ylab("") +
+#   theme_bw() + theme(legend.position="none") +
+#   ggtitle("Make Donation") + theme(plot.title = element_text(face="bold")) +
+#   geom_text(aes(44, 39, label="Richest Quintile", color="2")) +
+#   geom_text(aes(43, 9, label="Poorest Quintile", color="-2")) +
+#   scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
+#   scale_colour_manual(values = c("red", "blue")) +
+#   scale_fill_manual(values = c("red", "blue"))
+# 
+# pp.meetings.plot <- ggplot(pp.meetings, aes(x = gini_st1, y = est, group = income)) + 
+#   geom_line(aes(colour = income)) + 
+#   geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
+#   xlab("Income Inequality") + ylab("") +
+#   theme_bw() + theme(legend.position="none") +
+#   ggtitle("Attend Meetings") + theme(plot.title = element_text(face="bold")) +
+#   geom_text(aes(44, 18.7, label="Richest Quintile", color="2")) +
+#   geom_text(aes(43, 7, label="Poorest Quintile", color="-2")) +
+#   scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
+#   scale_colour_manual(values = c("red", "blue")) +
+#   scale_fill_manual(values = c("red", "blue"))
+# 
+# pp.polwork.plot <- ggplot(pp.polwork, aes(x = gini_st1, y = est, group = income)) + 
+#   geom_line(aes(colour = income)) + 
+#   geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
+#   xlab("") + ylab("") +
+#   theme_bw() + theme(legend.position="none") +
+#   ggtitle("Work for Campaign") + theme(plot.title = element_text(face="bold")) +
+#   geom_text(aes(45, 8, label="Richest Quintile", color="2")) +
+#   geom_text(aes(43, 3.8, label="Poorest Quintile", color="-2")) +
+#   scale_y_continuous(limits=c(2, 10)) +
+#   scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
+#   scale_colour_manual(values = c("red", "blue")) +
+#   scale_fill_manual(values = c("red", "blue"))
 @
 
-<<label=pp_plot, echo=F, fig=T, include=F, width = 12, height = 5>>=
-multiplot(pp.donate.plot, pp.meetings.plot, pp.polwork.plot, layout = matrix(c(1, 2, 3), nrow=1))
+<<label=pp_plot>>=
+# , echo=F, fig=T, include=F, width = 12, height = 5
+# multiplot(pp.donate.plot, pp.meetings.plot, pp.polwork.plot, layout = matrix(c(1, 2, 3), nrow=1))
 @
 
 Figure~\ref{F:reg_plot} presents the results of the multilevel regression models as a dotplot: the dots represent the logit coefficients and the whiskers the associated 95\% confidence intervals \citep[see][]{Kastellec2007}.
@@ -591,7 +690,7 @@ Union members were more likely than otherwise similar non-members to engage in a
   \caption{Effects of Income Inequality on Campaign Participation}
   \label{F:reg_plot}
   \begin{center}
-    \includegraphics[width=6in]{CP1-reg_plot.pdf}
+%    \includegraphics[width=6in]{reg_plot.pdf}
   \end{center}
   \begin{footnotesize}
   \begin{tabular}{p{.2in} p{5.8in}}
@@ -613,7 +712,7 @@ These results are consistent with the relative power theory and contradict the e
   \caption{Estimated Coefficients of Income Inequality by Income Quintile}
   \label{F:coef_plot}
   \begin{center}
-    \includegraphics[width=6in]{CP1-coef_plot.pdf}
+%    \includegraphics[width=6in]{CP1-coef_plot.pdf}
   \end{center}
   \begin{footnotesize}
   \begin{tabular}{p{.2in} p{5.8in}}
@@ -630,7 +729,7 @@ We used the model parameters estimated in Figure~\ref{F:reg_plot} to compute the
   \caption{Predicted Probability of Campaign Participation by Income and Level of Inequality}
   \label{F:pp_plot}
   \begin{center}
-    \includegraphics[width=6in]{CP1-pp_plot.pdf}
+%    \includegraphics[width=6in]{CP1-pp_plot.pdf}
   \end{center}
   \begin{footnotesize}
   \begin{tabular}{p{.2in} p{5.8in}}
@@ -651,8 +750,7 @@ For those in the richest quintile, the predicted probability of attending meetin
 
 Finally, the left panel of Figure~\ref{F:pp_plot} presents the predicted probabilities of volunteering to work for a campaign.
 Again assuming otherwise mean characteristics, those in the poorest quintile have a predicted probability of volunteering of $6\pm2$\% when they live in a state with the lowest observed level of inequality.
-This predicted probability declines to $3.1\pm0.6$ when inequality is at highest observed level.  For those in the richest quintile, volunteering does not change by a statistically significant amount over the range of income inequality: the predicted probability varies from $6\pm2$\% to $5\pm1$\%.
-\footnote{\doublespacing For those with incomes in the median quintile, the predicted probability of volunteering ranges from $6\pm1$\% to $3.9\pm0.8$ over the observed range of income inequality.}
+This predicted probability declines to $3.1\pm0.6$ when inequality is at highest observed level.  For those in the richest quintile, volunteering does not change by a statistically significant amount over the range of income inequality: the predicted probability varies from $6\pm2$\% to $5\pm1$\%.\footnote{\doublespacing For those with incomes in the median quintile, the predicted probability of volunteering ranges from $6\pm1$\% to $3.9\pm0.8$ over the observed range of income inequality.}
 
 \section*{Discussion and Conclusion}
 
@@ -691,7 +789,6 @@ Make Donation & Dummy variable coded one if respondent made a political donation
 Attend Meetings & Dummy variable coded one if respondent attended a political meeting in the past year. \emph{Source}: 2012 CCES.\\
 Work for Campaign & Dummy variable coded one if respondent did volunteer work for a political campaign in the past year. \emph{Source}: 2012 CCES.\\
 Income Quintile & Quintile within state of respondent's household income. \emph{Source}: 2012 CCES.\\
-Absolute Income & Midpoint of respondent's household income category, in tens of thousands of dollars. \emph{Source}: 2012 CCES.\\
 Age & Respondent's age in years. \emph{Source}: 2012 CCES.\\
 Education & Respondent's education on six-point scale: 1. less than high school diploma, 2. high school graduate, 3. some college, 4. 2-year college degree, 5. 4-year college degree, 6. post-graduate degree. \emph{Source}: 2012 CCES.\\
 Republican & Dummy variable coded one if respondent was Republican, zero otherwise. \emph{Source}: 2012 CCES.\\
