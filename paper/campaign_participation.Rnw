@@ -269,7 +269,7 @@ In the least unequal state by this measure, \Sexpr{state_vars$state[which(state_
 On the other hand, \Sexpr{state_vars$state[which(state_vars$gini==max(state_vars$gini))]} was the most unequal state, with a Gini index of \Sexpr{max(state_vars$gini)}.
 Arizona and Pennsylvania flanked the median Gini index of the states, \Sexpr{median(state_vars$gini)}.
 
-<<label=scatter, fig.show="hide">>==
+<<label=scatter_plot, fig.show="hide">>==
 ggplot(data = cp_st1, aes(y = value, x = gini, label = postal)) +
   geom_text() + 
   facet_wrap(~ variable, scales = "free") +
@@ -378,6 +378,7 @@ format_mi_results <- function(m) {
   df %>% filter(term!="(Intercept)")
 }
 
+# estimate m1
 m1 <- with(mdf_mi_list, 
            glmer(formula = donate ~ gini_st + inc_rel + gini_st:inc_rel +
                    gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
@@ -389,6 +390,7 @@ m1_res <- format_mi_results(m1)
 @
 
 <<label=m2>>==
+# estimate m2
 m2 <- with(mdf_mi_list, 
            glmer(formula = meetings ~ gini_st + inc_rel + gini_st:inc_rel +
                    gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
@@ -400,6 +402,7 @@ m2_res <- format_mi_results(m2)
 @
 
 <<label=m3>>==
+# estimate m3
 m3 <- with(mdf_mi_list, 
            glmer(formula = polwork ~ gini_st + inc_rel + gini_st:inc_rel +
                    gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
@@ -535,7 +538,7 @@ m3_res <- format_mi_results(m3)
 
 @
 
-<<label=p>>==
+<<label=p_code>>==
 #echo=F, results=hide
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   require(grid)
