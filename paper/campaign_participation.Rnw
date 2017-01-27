@@ -269,8 +269,8 @@ In the least unequal state by this measure, \Sexpr{state_vars$state[which(state_
 On the other hand, \Sexpr{state_vars$state[which(state_vars$gini==max(state_vars$gini))]} was the most unequal state, with a Gini index of \Sexpr{max(state_vars$gini)}.
 Arizona and Pennsylvania flanked the median Gini index of the states, \Sexpr{median(state_vars$gini)}.
 
-<<label=scatter_plot, fig.show="hide">>==
-ggplot(data = cp_st1, aes(y = value, x = gini, label = postal)) +
+<<label=scatter_plot>>==
+p1 <- ggplot(data = cp_st1, aes(y = value, x = gini, label = postal)) +
   geom_text() + 
   facet_wrap(~ variable, scales = "free") +
   theme_bw() +
@@ -282,14 +282,14 @@ ggplot(data = cp_st1, aes(y = value, x = gini, label = postal)) +
   xlab("Income Inequality") +
   scale_x_continuous(limits=c(.392, .508), breaks=seq(.40, .50, .02))
 dir.create("figures", showWarnings = FALSE)
-ggsave("figures/scatter.pdf", width = 12, height = 5)
+ggsave("figures/scatter_plot.pdf", plot = p1, width = 12, height = 5)
 @
 
 \begin{figure}[!htbp] 
   \caption{Income Inequality and Campaign Participation By State}
   \label{F:scatter}
   \begin{center}
-    \includegraphics[width=6in]{figures/scatter.pdf}
+    \includegraphics[width=6in]{figures/scatter_plot.pdf}
   \end{center}
 \end{figure}
 
@@ -415,152 +415,42 @@ m3_res <- format_mi_results(m3)
 @
 
 <<label=dw_plot>>==
-# level_brackets <- list(c("State-Level", "gini_cnty", "pop_cnty"),
-                       # c("Individual-Level", "income", "attend"))
+level_brackets <- list(c("State Controls", "gdppc_st", "swmar_st"),
+                       c("Individual Controls", "age", "union"))
+
+vars_list <- c("gini_st", "inc_rel", "gini_st:inc_rel", "gdppc_st", "div_st",
+               "inits_st", "gov_st", "sen_st", "swmar_st",
+               "age", "educated", "male", "hisp", "black",
+               "married", "children", "rep", "dem", "church", "union")
+
+vars_proper <- c("Income Inequality", "Income Quintile", "Inequality X Income Quintile",
+         "GDP/Capita", "Ethnic Diversity", 
+         "Ballot Initiatives", "Gubernatorial Race", "Senatorial Race",
+         "Margin, Closest Statewide Race", "Age", "Education", "Male",
+         "Latino", "African-American", "Married", "Children", 
+         "Republican", "Democrat", "Religious Attendance", "Union Member")
+
+m1_res <- m1_res[match(vars_list, m1_res$term),]
+m2_res <- m2_res[match(vars_list, m2_res$term),]
+m3_res <- m3_res[match(vars_list, m3_res$term),]
 
 p <- rbind(m1_res, m2_res, m3_res) %>% 
   by_2sd(m1[[1]]@frame) %>% 
-  dwplot() #+
-#   relabel_y_axis(vars_proper) +
-#   theme_bw() + xlab("Coefficient Estimate") +
-#   geom_vline(xintercept = 0, colour = "grey60", linetype = 2) +
-#   theme(legend.justification=c(0, 1), legend.position=c(0, 1),
-#         legend.background = element_rect(colour="grey80"),
-#         legend.title.align = .5,
-#         legend.text = element_text(size = 9),
-#         legend.key.height = unit(12, "pt")) +
-#   scale_colour_grey(start = .7, end = .5,
-#                     name = "Data",
-#                     breaks = c("t2", "t2_all"),
-#                     labels = c("Pew 2006", "Pew 2005-2009"))
-# g <- p %>% add_brackets(level_brackets)
-
-ggsave("figures/dw_plot.pdf", plot = g, width = 6, height = 5)  
-@
-
-<<label=old>>==
-# Regression Results Graph Prep
-# donate.reg <- importHLM(file=paste0(study.dir,"donate/gamvcpar.dat"))
-# meetings.reg <- importHLM(file=paste0(study.dir,"meetings/gamvcpar.dat"))
-# polwork.reg <- importHLM(file=paste0(study.dir,"polwork/gamvcpar.dat"))
-# 
-# donate.sims <- simsHLM(file=paste0(study.dir,"donate/gamvcpar.dat"))
-# meetings.sims <- simsHLM(file=paste0(study.dir,"meetings/gamvcpar.dat"))
-# polwork.sims <- simsHLM(file=paste0(study.dir,"polwork/gamvcpar.dat"))
-# 
-# donate.sims$dv <- "Make Donation"
-# meetings.sims$dv <- "Attend Meetings"
-# polwork.sims$dv <- "Work for Campaign"
-# 
-# sims <- rbind(donate.sims, meetings.sims, polwork.sims)
-# 
-# var <- c("Intercept", "Income Inequality", "GDP/Capita", "Ethnic Diversity", 
-#          "Ballot Initiatives", "Gubernatorial Race", "Senatorial Race",
-#          "Margin, Statewide Races", "Age", "Education",
-#          "Republican", "Democrat", "African-American", "Latino", "Male", 
-#          "Married", "Children", "Church Attendance", "Union Member",
-#          "Income Quintile", "Inequality*Income Quintile")
-# 
-# sds <- apply(cces, 2, function(x) sd(x, na.rm=T)) 
-# sds <- c(1, sds, sds[1]*sds[length(sds)])
-# dich.ivs <- c("gov_st", "sen_st", "rep", "dem", "black", "hisp", "male", "married", "unionmem")
-# sds[dich.ivs] <- .5
-# 
-# donate.reg <- cbind(donate.reg, var, ivs, sds)
-# donate.reg$dv <- "Make Donation"
-# meetings.reg <- cbind(meetings.reg, var, ivs, sds)
-# meetings.reg$dv <- "Attend Meetings"
-# polwork.reg <- cbind(polwork.reg, var, ivs, sds)
-# polwork.reg$dv <- "Work for Campaign"
-# 
-# ineq.median <- quantile(cces$gini_st1, prob=.5)
-# 
-# donate.reg$b[donate.reg$ivs=="income"] <- mean(donate.sims$income + ineq.median * donate.sims$giniXincome)
-# donate.reg$se[donate.reg$ivs=="income"] <- sd(donate.sims$income + ineq.median * donate.sims$giniXincome)
-# 
-# meetings.reg$b[meetings.reg$ivs=="income"] <- mean(meetings.sims$income + ineq.median * meetings.sims$giniXincome)
-# meetings.reg$se[meetings.reg$ivs=="income"] <- sd(meetings.sims$income + ineq.median * meetings.sims$giniXincome)
-# 
-# polwork.reg$b[polwork.reg$ivs=="income"] <- mean(polwork.sims$income + ineq.median * polwork.sims$giniXincome)
-# polwork.reg$se[polwork.reg$ivs=="income"] <- sd(polwork.sims$income + ineq.median * polwork.sims$giniXincome)
-# 
-# reg.results <- rbind(donate.reg[-1,], meetings.reg[-1,], polwork.reg[-1,])
-# reg.results$dv <- factor(reg.results$dv, levels=c("Make Donation", "Attend Meetings", "Work for Campaign"))
-# reg.results$b <- with(reg.results, b*2*sds) 
-# reg.results$se <- with(reg.results, se*2*sds) 
-# reg.results$lb <- with(reg.results, b - 1.96*se) 
-# reg.results$ub <- with(reg.results, b + 1.96*se)
-# reg.results$no[reg.results$no>=3] <- reg.results$no[reg.results$no>=3] + 1
-# reg.results$no[reg.results$var=="Income Inequality"] <- 1
-# reg.results$no[reg.results$var=="Inequality*Income Quintile"] <- 2
-# reg.results$no[reg.results$var=="Income Quintile"] <- 3
-# reg.results$no[reg.results$var=="Ethnic Diversity"] <- 4
-# reg.results$no[reg.results$var=="GDP/Capita"] <- 5
-# reg.results <- reg.results[with(reg.results, order(dv, no)), ]
-# 
-# offset <- .2
-# reg.results$no[reg.results$dv=="Make Donation"] <- reg.results$no[reg.results$dv=="Make Donation"] - offset
-# reg.results$no[reg.results$dv=="Work for Campaign"] <- reg.results$no[reg.results$dv=="Work for Campaign"] + offset
-# 
-# n.vars <- length(donate.reg$var)-1
-# 
-# 
-# # Inequality Coefficients Graph Prep
-# coef1 <- data.frame(coef = with(sims, gini_st1 + giniXincome * -2), dv = sims$dv)
-# coef2 <- data.frame(coef = with(sims, gini_st1 + giniXincome * -1), dv = sims$dv)
-# coef3 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 0), dv = sims$dv)
-# coef4 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 1), dv = sims$dv)
-# coef5 <- data.frame(coef = with(sims, gini_st1 + giniXincome * 2), dv = sims$dv)
-# 
-# coef1$quintile <- "Poorest Quintile"
-# coef2$quintile <- "Second Quintile"
-# coef3$quintile <- "Median Quintile"
-# coef4$quintile <- "Fourth Quintile"
-# coef5$quintile <- "Richest Quintile"
-# 
-# coefs <- rbind(coef1, coef2, coef3, coef4, coef5)
-# 
-# coefs.sum <- ddply(coefs, .(dv, quintile), summarize, 
-#                    b = mean(coef),
-#                    ub = quantile(coef, 0.975),
-#                    lb = quantile(coef, 0.025))
-# 
-# coefs.sum$quintile <- factor(coefs.sum$quintile, levels=c("Poorest Quintile", 
-#                                                           "Second Quintile", 
-#                                                           "Median Quintile", 
-#                                                           "Fourth Quintile", 
-#                                                           "Richest Quintile"))
-# 
-# coefs.sum$dv <- factor(coefs.sum$dv, levels=c("Make Donation", "Attend Meetings", "Work for Campaign"))
-# 
-# coefs.sum.unstd <- coefs.sum
-# 
-# coefs.sum[3:5] <- coefs.sum[3:5] * sds[1] * 2
-# 
-# pd <- position_dodge(.25)
-@
-
-<<label=reg_plot>>=
-# , echo=F, fig=T, include=F, width = 9, height = 6
-# ggplot(data = reg.results, aes(y = no, x = b, colour=dv)) +
-#   geom_point() + geom_errorbarh(aes(xmin = lb, xmax = ub, height=0)) +
-#   ylab("") + xlab("") + theme_bw() + 
-#   scale_colour_manual(values = c("red","black", "blue")) +
-#   scale_y_reverse(breaks = 1:n.vars, labels = reg.results[1:n.vars,"var"]) +
-#   theme(legend.title=element_blank(), legend.position=c(.875, .1)) +
-#   geom_vline(xintercept=c(0), linetype="dotted")
-@
-
-<<label=coef_plot>>=
-# , echo=F, fig=T, include=F, width = 9, height = 6
-# ggplot(data = coefs.sum, aes(x = quintile, y = b, colour = dv)) +
-#   geom_point(position = pd) + 
-#   geom_errorbar(aes(ymin = lb, ymax = ub, width = 0), position=pd) +
-#   ylab("Standardized Coefficient for Inequality") + xlab("") + theme_bw() + 
-#   scale_colour_manual(values = c("red","black", "blue")) +
-#   theme(legend.title=element_blank(), legend.position=c(.1, .9)) +
-#   geom_hline(yintercept=c(0), linetype="dotted")
-
+  dwplot() +
+  relabel_y_axis(vars_proper) +
+   theme_bw() + xlab("Coefficient Estimate") +
+  geom_vline(xintercept = 0, colour = "grey60", linetype = 2) +
+  theme(legend.position=c(.875, .08),
+        legend.background = element_rect(colour="grey80"),
+        legend.title.align = .5,
+        legend.text = element_text(size = 9),
+        legend.key.height = unit(12, "pt"),
+        legend.title = element_blank()) +
+  scale_colour_manual(values = c("red","black", "blue"),
+                    breaks = c("m1", "m2", "m3"),
+                    labels = c("Make Donation", "Attend Meetings", "Work for Campaign"))
+g <- p %>% add_brackets(level_brackets)
+ggsave("figures/reg_plot.pdf", plot = g, width = 9, height = 6)  
 @
 
 <<label=p_code>>==
@@ -718,7 +608,7 @@ Union members were more likely than otherwise similar non-members to engage in a
   \caption{Effects of Income Inequality on Campaign Participation}
   \label{F:reg_plot}
   \begin{center}
-%    \includegraphics[width=6in]{reg_plot.pdf}
+    \includegraphics[width=6in]{figures/reg_plot.pdf}
   \end{center}
   \begin{footnotesize}
   \begin{tabular}{p{.2in} p{5.8in}}
