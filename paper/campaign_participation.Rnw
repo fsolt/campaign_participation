@@ -453,6 +453,41 @@ g <- p %>% add_brackets(level_brackets)
 ggsave("figures/reg_plot.pdf", plot = g, width = 9, height = 6)  
 @
 
+<<label=coef_plot>>=
+gini_2sd <- 2 * sd(m1[[1]]@frame[["gini_st"]])
+coefs_donate <- interplot(m1, "gini_st", "inc_rel", plot = FALSE) %>% 
+  mutate_at(vars(-inc_rel), funs(. * gini_2sd)) %>% 
+  mutate(dv = "Make Donation")
+coefs_meetings <- interplot(m2, "gini_st", "inc_rel", plot = FALSE) %>% 
+  mutate_at(vars(-inc_rel), funs(. * gini_2sd)) %>% 
+  mutate(dv = "Attend Meetings")
+coefs_polwork <- interplot(m3, "gini_st", "inc_rel", plot = FALSE) %>% 
+  mutate_at(vars(-inc_rel), funs(. * gini_2sd)) %>% 
+  mutate(dv = "Work for Campaign")
+
+coefs_all <- bind_rows(coefs_donate, coefs_meetings, coefs_polwork) %>% 
+  mutate(quintile = factor(inc_rel, 
+                           levels = -2:2,
+                           labels = c("Poorest Quintile",
+                                      "Second Quintile",
+                                      "Median Quintile",
+                                      "Fourth Quintile",
+                                      "Richest Quintile")))
+
+pd <- position_dodge(.25)
+p2 <- ggplot(data = coefs_all, aes(x = quintile, y = coef, colour = dv)) +
+  geom_point(position = pd) +
+  geom_errorbar(aes(ymin = lb, ymax = ub, width = 0), position=pd) +
+  ylab("Standardized Coefficient for Inequality") + xlab("") + theme_bw() +
+  scale_colour_manual(values = c("red","black", "blue")) +
+  theme(legend.title=element_blank(), 
+        legend.position=c(.1, .9),
+        legend.background = element_rect(colour="grey80")) +
+  geom_hline(yintercept=c(0), linetype="dotted")
+ggsave("figures/coef_plot.pdf", p2, width = 9, height = 6)
+@
+
+
 <<label=p_code>>==
 #echo=F, results=hide
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
@@ -491,105 +526,125 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   }
 }
 
-pp.data <- function(dv = NULL) {
-  dv.sims <- get(paste0(dv, ".sims"))
-  dv.sims <- dv.sims[, -length(dv.sims)]
-  df <- cces
-  df$constant <- 1
-  df$giniXincome <- with(df, gini_st1*income)
-  df <- df[ivs]
-  vars.mean <- data.frame(t(colMeans(df)))
-  for(i in seq(length(ivs))) {
-    tab <- table(df[, ivs[i]])
-    if (length(tab) == 2) {
-      vars.mean[i] <- as.numeric(names(tab[which(tab == max(tab))]))
-    }
-  }
-  fake.data <- vars.mean[rep(1:nrow(vars.mean),each=100), ] 
-  fake.data$gini_st1 <- with(df, rep(seq(min(gini_st1), max(gini_st1), length.out=20), times=5))
-  fake.data$income <- rep(-2:2, each=20)
-  fake.data$giniXincome <- with(fake.data, gini_st1 * income)
-  fake.data <- fake.data[fake.data$income==-2 | fake.data$income==2, ]
+pred_probs <- function(m, var1, var2, var2_vals,
+                       times = 20, sims = 1000) {
+  m_list <- m
+  m <- m_list[[1]]
+  class(m_list) <- class(m)
+  m_sims_list <- lapply(m_list, function(i) arm::sim(i, sims))
+  m_sims <- m_sims_list[[1]]
   
-  pp <- rowMeans(plogis(data.matrix(fake.data) %*% t(data.matrix(dv.sims))))
-  rowQuantiles <- function (x, probs = seq(from = 0, to = 1, by = 0.25), ..., drop = TRUE) {
+  for (i in 2:length(m_sims_list)) {
+    m_sims@fixef <- rbind(m_sims@fixef, m_sims_list[[i]]@fixef)
+    m_sims@ranef[[1]] <- abind::abind(m_sims@ranef[[1]], m_sims_list[[i]]@ranef[[1]], along = 1)
+  }
+  
+  df <- data.frame(m@frame)
+  # omit L2 vars
+  for (i in seq(length(names(m@flist)))) {
+    df[[names(m@flist)[i]]] <- NULL  
+  }
+   
+  names(df)[1] <- "(Intercept)" # replace DV with intercept
+  df$`(Intercept)` <- 1
+  
+  # Find name of interaction term
+  ifelse(var1 == var2, var12 <- paste0("I(", var1, "^2)"), 
+         var12 <- paste0(var2, ":", var1))
+  if (!var12 %in% unlist(dimnames(m@pp$X)[2])) 
+    var12 <- paste0(var1, ":", var2)
+  if (!var12 %in% unlist(dimnames(m@pp$X)[2])) 
+    stop(paste("Model does not include the interaction of", var1, "and", 
+               var2, "."))
+  iv_medians <- summarize_each(df, funs(median(., na.rm = TRUE))) 
+
+  fake_data <- iv_medians[rep(1:nrow(iv_medians), each=times*length(var2_vals)), ] 
+  fake_data[[var1]] <- with(df, rep(seq(min(get(var1)), max(get(var1)), length.out=times),times=length(var2_vals)))
+  fake_data[[var2]] <- rep(var2_vals, each=times)
+  fake_data[[var12]] <- fake_data[[var1]] * fake_data[[var2]]
+
+  pp <- rowMeans(plogis(data.matrix(fake_data) %*% t(data.matrix(m_sims@fixef))))
+  row_quantiles <- function (x, probs) {
     naValue <- NA
     storage.mode(naValue) <- storage.mode(x)
     nrow <- nrow(x)
     q <- matrix(naValue, nrow = nrow, ncol = length(probs))
     if (nrow > 0L) {
-      t <- quantile(x[1L, ], probs = probs, ...)
+      t <- quantile(x[1L, ], probs = probs)
       colnames(q) <- names(t)
       q[1L, ] <- t
       if (nrow >= 2L) {
         for (rr in 2:nrow) {
-          q[rr, ] <- quantile(x[rr, ], probs = probs, ...)
+          q[rr, ] <- quantile(x[rr, ], probs = probs)
         }
       }
     }
     else {
-      t <- quantile(0, probs = probs, ...)
+      t <- quantile(0, probs = probs)
       colnames(q) <- names(t)
     }
-    if (drop) {
-      q <- drop(q)
-    }
+    q <- drop(q)
     q
   }
-  pp.b <- rowQuantiles(plogis(data.matrix(fake.data) %*% t(data.matrix(dv.sims[, 1:21]))), prob = c(.025, .975))
-  pp <- cbind(pp, pp.b)
+  pp_bounds <- row_quantiles(plogis(data.matrix(fake_data) %*% t(data.matrix(m_sims@fixef))), prob = c(.025, .975))
+  pp <- cbind(pp, pp_bounds)
   pp <- pp*100
   colnames(pp) <- c("est", "lb", "ub")
-  pp <- cbind(fake.data, pp)
-  pp$income <- as.factor(pp$income)
+  pp <- cbind(fake_data, pp)
+  pp[[var2]] <- as.factor(pp[[var2]])
   return(pp)
 }
 
-# pp.donate <- pp.data("donate")
-# pp.meetings <- pp.data("meetings")
-# pp.polwork <- pp.data("polwork")
-# 
-# pp.donate.plot <- ggplot(pp.donate, aes(x = gini_st1, y = est, group = income)) + 
-#   geom_line(aes(colour = income)) + 
-#   geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
-#   xlab("") + ylab("") +
-#   theme_bw() + theme(legend.position="none") +
-#   ggtitle("Make Donation") + theme(plot.title = element_text(face="bold")) +
-#   geom_text(aes(44, 39, label="Richest Quintile", color="2")) +
-#   geom_text(aes(43, 9, label="Poorest Quintile", color="-2")) +
-#   scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
-#   scale_colour_manual(values = c("red", "blue")) +
-#   scale_fill_manual(values = c("red", "blue"))
-# 
-# pp.meetings.plot <- ggplot(pp.meetings, aes(x = gini_st1, y = est, group = income)) + 
-#   geom_line(aes(colour = income)) + 
-#   geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
-#   xlab("Income Inequality") + ylab("") +
-#   theme_bw() + theme(legend.position="none") +
-#   ggtitle("Attend Meetings") + theme(plot.title = element_text(face="bold")) +
-#   geom_text(aes(44, 18.7, label="Richest Quintile", color="2")) +
-#   geom_text(aes(43, 7, label="Poorest Quintile", color="-2")) +
-#   scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
-#   scale_colour_manual(values = c("red", "blue")) +
-#   scale_fill_manual(values = c("red", "blue"))
-# 
-# pp.polwork.plot <- ggplot(pp.polwork, aes(x = gini_st1, y = est, group = income)) + 
-#   geom_line(aes(colour = income)) + 
-#   geom_ribbon(aes(ymin=lb, ymax=ub, fill = income), alpha=.4) +
-#   xlab("") + ylab("") +
-#   theme_bw() + theme(legend.position="none") +
-#   ggtitle("Work for Campaign") + theme(plot.title = element_text(face="bold")) +
-#   geom_text(aes(45, 8, label="Richest Quintile", color="2")) +
-#   geom_text(aes(43, 3.8, label="Poorest Quintile", color="-2")) +
-#   scale_y_continuous(limits=c(2, 10)) +
-#   scale_x_continuous(limits=c(40, 50.4), breaks=seq(40, 50, 2)) +
-#   scale_colour_manual(values = c("red", "blue")) +
-#   scale_fill_manual(values = c("red", "blue"))
+pp_donate <- pred_probs(m1, var1 = "gini_st", var2 = "inc_rel", var2_vals = c(-2, 2), times = 50) %>% 
+  mutate(gini_st = gini_st + median_gini_st) # uncenter
+pp_meetings <- pred_probs(m2, var1 = "gini_st", var2 = "inc_rel", var2_vals = c(-2, 2), times = 50) %>% 
+  mutate(gini_st = gini_st + median_gini_st) # uncenter
+pp_polwork <- pred_probs(m3, var1 = "gini_st", var2 = "inc_rel", var2_vals = c(-2, 2), times = 50) %>% 
+  mutate(gini_st = gini_st + median_gini_st) # uncenter
+
+pp_donate_plot <- ggplot(pp_donate, aes(x = gini_st, y = est, group = inc_rel)) + 
+  geom_line(aes(colour = inc_rel)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill = inc_rel), alpha=.4) +
+  xlab("") + ylab("") +
+  theme_bw() + theme(legend.position="none") +
+  ggtitle("Make Donation") + theme(plot.title = element_text(face="bold")) +
+  geom_text(aes(.43, 39, label="Richest Quintile", color="2")) +
+  geom_text(aes(.46, 9, label="Poorest Quintile", color="-2")) +
+  scale_x_continuous(limits=c(.40, .504), breaks=seq(.40, .50, .02)) +
+  scale_colour_manual(values = c("red", "blue")) +
+  scale_fill_manual(values = c("red", "blue"))
+
+pp_meetings_plot <- ggplot(pp_meetings, aes(x = gini_st, y = est, group = inc_rel)) + 
+  geom_line(aes(colour = inc_rel)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill = inc_rel), alpha=.4) +
+  xlab("Income Inequality") + ylab("") +
+  theme_bw() + theme(legend.position="none") +
+  ggtitle("Attend Meetings") + theme(plot.title = element_text(face="bold")) +
+  geom_text(aes(.435, 18, label="Richest Quintile", color="2")) +
+  geom_text(aes(.47, 5, label="Poorest Quintile", color="-2")) +
+  scale_x_continuous(limits=c(.40, .504), breaks=seq(.40, .50, .02)) +
+  scale_colour_manual(values = c("red", "blue")) +
+  scale_fill_manual(values = c("red", "blue"))
+
+pp_polwork_plot <- ggplot(pp_polwork, aes(x = gini_st, y = est, group = inc_rel)) + 
+  geom_line(aes(colour = inc_rel)) +
+  geom_ribbon(aes(ymin=lb, ymax=ub, fill = inc_rel), alpha=.4) +
+  xlab("") + ylab("") +
+  theme_bw() + theme(legend.position="none") +
+  ggtitle("Work for Campaign") + theme(plot.title = element_text(face="bold")) +
+  geom_text(aes(.43, 8, label="Richest Quintile", color="2")) +
+  geom_text(aes(.46, 3.8, label="Poorest Quintile", color="-2")) +
+  scale_y_continuous(limits=c(2, 10)) +
+  scale_x_continuous(limits=c(.40, .504), breaks=seq(.40, .50, .02)) +
+  scale_colour_manual(values = c("red", "blue")) +
+  scale_fill_manual(values = c("red", "blue"))
 @
 
 <<label=pp_plot>>=
 # , echo=F, fig=T, include=F, width = 12, height = 5
-# multiplot(pp.donate.plot, pp.meetings.plot, pp.polwork.plot, layout = matrix(c(1, 2, 3), nrow=1))
+pdf("figures/pp_plot.pdf", width = 12, height = 5)
+multiplot(pp_donate_plot, pp_meetings_plot, pp_polwork_plot, layout = matrix(c(1, 2, 3), nrow=1))
+dev.off()
 @
 
 Figure~\ref{F:reg_plot} presents the results of the multilevel regression models as a dotplot: the dots represent the logit coefficients and the whiskers the associated 95\% confidence intervals \citep[see][]{Kastellec2007}.
@@ -601,7 +656,7 @@ African-Americans and Latinos were considerably less likely than Anglo whites to
 Men were more likely to women to donate money or attend meetings, but otherwise similar people of both genders volunteered to work on campaigns at similar rates.
 Married people were less likely to participate in campaign activities.
 The estimated coefficient for children is negative for donating money but positive for attending meetings; that for volunteering is negative but cannot be distinguished from zero in these data.
-More frequent church attendance was associated with higher rates of meeting attendance and campaign volunteering but lower rates of political donations.
+More frequent attendance at religious services was associated with higher rates of meeting attendance and campaign volunteering but lower rates of political donations.
 Union members were more likely than otherwise similar non-members to engage in all three forms of campaign participation. 
 
 \begin{figure}[!hbtp] 
@@ -630,7 +685,7 @@ These results are consistent with the relative power theory and contradict the e
   \caption{Estimated Coefficients of Income Inequality by Income Quintile}
   \label{F:coef_plot}
   \begin{center}
-%    \includegraphics[width=6in]{CP1-coef_plot.pdf}
+%    \includegraphics[width=6in]{coef_plot.pdf}
   \end{center}
   \begin{footnotesize}
   \begin{tabular}{p{.2in} p{5.8in}}
