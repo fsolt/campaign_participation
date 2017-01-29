@@ -685,7 +685,7 @@ These results are consistent with the relative power theory and contradict the e
   \caption{Estimated Coefficients of Income Inequality by Income Quintile}
   \label{F:coef_plot}
   \begin{center}
-%    \includegraphics[width=6in]{coef_plot.pdf}
+    \includegraphics[width=6in]{figures/coef_plot.pdf}
   \end{center}
   \begin{footnotesize}
   \begin{tabular}{p{.2in} p{5.8in}}
@@ -702,7 +702,7 @@ We used the model parameters estimated in Figure~\ref{F:reg_plot} to compute the
   \caption{Predicted Probability of Campaign Participation by Income and Level of Inequality}
   \label{F:pp_plot}
   \begin{center}
-%    \includegraphics[width=6in]{CP1-pp_plot.pdf}
+    \includegraphics[width=6in]{figures/pp_plot.pdf}
   \end{center}
   \begin{footnotesize}
   \begin{tabular}{p{.2in} p{5.8in}}
