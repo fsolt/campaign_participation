@@ -383,8 +383,8 @@ format_mi_results <- function(m) {
 m1 <- with(mdf_mi_list, 
            glmer(formula = donate ~ gini_st + inc_rel + gini_st:inc_rel +
                    gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
-                   age + educated + rep + dem + black + hisp + 
-                   male + married + children + church + union +
+                   age + educated + homeowner + rep + dem + black + hisp + 
+                   male + married + children + resident + church + union +
                    (1 + inc_rel|state_alpha), family=binomial(link="logit")))
 
 m1_res <- format_mi_results(m1)
@@ -395,8 +395,8 @@ m1_res <- format_mi_results(m1)
 m2 <- with(mdf_mi_list, 
            glmer(formula = meetings ~ gini_st + inc_rel + gini_st:inc_rel +
                    gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
-                   age + educated + rep + dem + black + hisp + 
-                   male + married + children + church + union +
+                   age + educated + homeowner + rep + dem + black + hisp + 
+                   male + married + children + resident + church + union +
                    (1 + inc_rel|state_alpha), family=binomial(link="logit")))
 
 m2_res <- format_mi_results(m2)
@@ -407,28 +407,28 @@ m2_res <- format_mi_results(m2)
 m3 <- with(mdf_mi_list, 
            glmer(formula = polwork ~ gini_st + inc_rel + gini_st:inc_rel +
                    gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
-                   age + educated + rep + dem + black + hisp + 
-                   male + married + children + church + union +
+                   age + educated + homeowner + rep + dem + black + hisp + 
+                   male + married + children + resident + church + union +
                    (1 + inc_rel|state_alpha), family=binomial(link="logit")))
 
 m3_res <- format_mi_results(m3)
 @
 
-<<label=dw_plot>>==
+<<label=reg_plot>>==
 level_brackets <- list(c("State Controls", "gdppc_st", "swmar_st"),
                        c("Individual Controls", "age", "union"))
 
 vars_list <- c("gini_st", "inc_rel", "gini_st:inc_rel", "gdppc_st", "div_st",
                "inits_st", "gov_st", "sen_st", "swmar_st",
-               "age", "educated", "male", "hisp", "black",
-               "married", "children", "rep", "dem", "church", "union")
+               "age", "educated", "homeowner", "male", "hisp", "black",
+               "married", "children", "rep", "dem", "resident", "church", "union")
 
 vars_proper <- c("Income Inequality", "Income Quintile", "Inequality X Income Quintile",
          "GDP/Capita", "Ethnic Diversity", 
          "Ballot Initiatives", "Gubernatorial Race", "Senatorial Race",
-         "Margin, Closest Statewide Race", "Age", "Education", "Male",
+         "Margin, Closest Statewide Race", "Age", "Education", "Homeowner", "Male",
          "Latino", "African-American", "Married", "Children", 
-         "Republican", "Democrat", "Religious Attendance", "Union Member")
+         "Republican", "Democrat", "Length of Residence", "Religious Attendance", "Union Member")
 
 m1_res <- m1_res[match(vars_list, m1_res$term),]
 m2_res <- m2_res[match(vars_list, m2_res$term),]
@@ -748,60 +748,14 @@ Where the gap between richer and poorer citizens are larger, democracy is corres
 
 \end{spacing}
 
-\pagebreak
-\appendix
-
-\section{Measures and Data Sources}
-
-\begin{table}[hbtp] 
-\begin{tabular}{l p{10cm}}
-\textbf{Individual Characteristics}\\
-\hline
-\hline
-Make Donation & Dummy variable coded one if respondent made a political donation in the past year. \emph{Source}: 2012 Cooperative Congressional Election Study \citep{Ansolabehere2013a}.\\
-Attend Meetings & Dummy variable coded one if respondent attended a political meeting in the past year. \emph{Source}: 2012 CCES.\\
-Work for Campaign & Dummy variable coded one if respondent did volunteer work for a political campaign in the past year. \emph{Source}: 2012 CCES.\\
-Income Quintile & Quintile within state of respondent's household income. \emph{Source}: 2012 CCES.\\
-Age & Respondent's age in years. \emph{Source}: 2012 CCES.\\
-Education & Respondent's education on six-point scale: 1. less than high school diploma, 2. high school graduate, 3. some college, 4. 2-year college degree, 5. 4-year college degree, 6. post-graduate degree. \emph{Source}: 2012 CCES.\\
-Republican & Dummy variable coded one if respondent was Republican, zero otherwise. \emph{Source}: 2012 CCES.\\
-Democrat & Dummy variable coded one if respondent was Democrat, zero otherwise. \emph{Source}: 2012 CCES.\\
-African American & Dummy variable coded one if respondent was African American, zero otherwise. \emph{Source}: 2012 CCES.\\
-Latino & Dummy variable coded one if respondent was latino, zero otherwise. \emph{Source}: 2012 CCES.\\
-Male & Dummy variable coded one if respondent was male, zero otherwise. \emph{Source}: 2012 CCES.\\
-Married & Dummy variable coded one if respondent was married, zero otherwise. \emph{Source}: 2012 CCES.\\
-Church Attendance & Respondent's attendance at religious services on six-point scale: 1. never, 2. seldom, 3. few times a year, 4. once or twice a month, 5. once a week, 6. more than once a week. \emph{Source}: 2012 CCES.\\
-Union Member & Dummy coded one if respondent was a union member, zero otherwise. \emph{Source}: 2012 CCES.\\
-\hline
-\hline
-\end{tabular}
-\end{table}
-
-\vspace{1in}
-
-\begin{table}[hbtp]
-\begin{tabular}{l p{10cm}}
-\textbf{Contextual Characteristics}\\
-\hline
-\hline
-Income Inequality & Gini coefficient of household income as measured in the 2011 American Community Survey.
-\emph{Source}: \citet{Noss2012}.\\
-GDP/Capita  & 2011 state gross domestic product per capita, thousands of 2009 dollars.  \emph{Source}: U.S. Department of Commerce, Bureau of Economic Analysis.\\ 
-Ethnic Diversity & Probability that two randomly selected state residents belong to different racial or ethnic groups, calculated from standardized data from the U.S. Census. \emph{Source}: U.S. Census Bureau.\\
-Ballot Initiatives & Number of initiatives appearing on the state ballot.  \emph{Source}: Initiative \& Referendum Institute, University of Southern California, \texttt{http://www.iandrinstitute.org}.\\
-Gubernatorial Race & Dummy variable coded one if there was a simultaneous gubernatorial election, zero otherwise. \\
-Senatorial Race & Dummy variable coded one if there was a simultaneous U.S. Senate election, zero otherwise. \\
-Margin, Statewide Races &  Percentage of votes cast for winner minus percentage for second-place candidate in state's closest statewide race (governatorial, senatorial, or presidential).\\
-\hline
-\hline
-\end{tabular}
-\end{table}
-
 \clearpage
 \pagebreak
 \newpage
 \bibliographystyle{ajps}
 \bibliography{FSLibrary}
+
+
+
 
 \end{document}
 

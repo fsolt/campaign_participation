@@ -9,7 +9,7 @@ oldls <- ls(envir, all = TRUE)
 # For each chunk...
 for(ch in extractchunks){   
   # Detect the file name of the database...
-  pat <- paste0("^", ch, ".*\\.rdb")
+  pat <- paste0("^", ch, "_.*\\.rdb")
   val <- gsub(".rdb", "", dir("cache", pattern = pat))
   # Lazy load the database
   lazyLoad(file.path("cache", val), envir = envir)
