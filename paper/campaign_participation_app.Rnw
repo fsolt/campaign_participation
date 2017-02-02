@@ -1,0 +1,264 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}  	% Enable graphics commands
+\usepackage{lscape}		% Enable landscape with \begin{landscape} until \end{landscape}
+\usepackage[section]{placeins} % Keep tables and figures within their own sections
+\usepackage{natbib}			% Enable citation commands \citep{}, \citet{}, etc.
+\bibpunct{(}{)}{;}{a}{}{,}		% Formatting for in-text citations
+\usepackage{setspace}		% Enable double-spacing with \begin{spacing}{2} until \end{spacing}.
+\usepackage[utf8]{inputenc} 	% Enable utf8 characters, i.e., accents without coding--just type them in.
+\usepackage[english]{babel}	% English hyphenation and alphabetization.  Other languages available.
+\usepackage{dcolumn}        % For decimal-aligned stargazer output.
+\usepackage[colorlinks=true, urlcolor=blue, citecolor=black, linkcolor=black]{hyperref} % Include hyperlinks with the \url and \href commands.
+\setlength{\tabcolsep}{1pt}	% Make tables slightly narrower by reducing space between columns.
+
+\renewcommand\floatpagefraction{.9}	% These commands allow larger tables and graphics to fit
+\renewcommand\topfraction{.9}		% on a page when default settings would complain.
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}
+\setcounter{totalnumber}{50}
+\setcounter{topnumber}{50}
+\setcounter{bottomnumber}{50}
+
+\newcommand{\R}{\textsf{R}~}        %This creates the command \R to typeset the name R correctly.
+
+%\usepackage[left=1in, right=1in]{geometry}	%Turn footnotes into endnotes (commented out).
+%\renewcommand{\footnotesize}{\normalsize}	
+%\usepackage{endnotes}
+%\renewcommand{\footnote}{\endnote}
+%\renewcommand{\section}{\subsection}
+
+\usepackage{fullpage}
+
+\begin{document}
+
+<<label=preamble, include=FALSE>>=
+library(knitr)
+opts_chunk$set(concordance=TRUE, cache=TRUE, warning=FALSE, message=FALSE, echo=FALSE, results='hide')
+@
+
+
+
+\title{Economic Inequality and\\ Campaign Participation\\ Online Appendices}		
+\author{
+    Michael Ritter\\
+    \href{mailto:michael-ritter@uiowa.edu}{michael-ritter@uiowa.edu}
+    \and
+    Frederick Solt\\
+    \href{mailto:frederick-solt@uiowa.edu}{frederick-solt@uiowa.edu}
+}
+\date{}				
+\maketitle
+
+\pagebreak
+\appendix
+
+\section{Measures and Data Sources}
+
+\begin{table}[hbtp] 
+\begin{tabular}{l p{10cm}}
+\textbf{Individual Characteristics}\\
+\hline
+\hline
+Make Donation & Dummy variable coded one if respondent made a political donation in the past year. \emph{Source}: 2012 Cooperative Congressional Election Study \citep{Ansolabehere2013a}.\\
+Attend Meetings & Dummy variable coded one if respondent attended a political meeting in the past year. \emph{Source}: 2012 CCES.\\
+Work for Campaign & Dummy variable coded one if respondent did volunteer work for a political campaign in the past year. \emph{Source}: 2012 CCES.\\
+Income Quintile & Quintile within state of respondent's household income. \emph{Source}: 2012 CCES.\\
+Age & Respondent's age in years. \emph{Source}: 2012 CCES.\\
+Education & Respondent's education on six-point scale: 1. less than high school diploma, 2. high school graduate, 3. some college, 4. 2-year college degree, 5. 4-year college degree, 6. post-graduate degree. \emph{Source}: 2012 CCES.\\
+Homeowner & Dummy variable coded one if respondent owned home, zero otherwise. \emph{Source}: 2012 CCES.\\
+Republican & Dummy variable coded one if respondent was Republican, zero otherwise. \emph{Source}: 2012 CCES.\\
+Democrat & Dummy variable coded one if respondent was Democrat, zero otherwise. \emph{Source}: 2012 CCES.\\
+African American & Dummy variable coded one if respondent was African American, zero otherwise. \emph{Source}: 2012 CCES.\\
+Latino & Dummy variable coded one if respondent was latino, zero otherwise. \emph{Source}: 2012 CCES.\\
+Male & Dummy variable coded one if respondent was male, zero otherwise. \emph{Source}: 2012 CCES.\\
+Married & Dummy variable coded one if respondent was married, zero otherwise. \emph{Source}: 2012 CCES.\\
+Church Attendance & Respondent's attendance at religious services on six-point scale: 1. never, 2. seldom, 3. few times a year, 4. once or twice a month, 5. once a week, 6. more than once a week. \emph{Source}: 2012 CCES.\\
+Union Member & Dummy coded one if respondent was a union member, zero otherwise. \emph{Source}: 2012 CCES.\\
+\hline
+\hline
+\end{tabular}
+\end{table}
+
+\vspace{1in}
+
+\begin{table}[hbtp]
+\begin{tabular}{l p{10cm}}
+\textbf{Contextual Characteristics}\\
+\hline
+\hline
+Income Inequality & Gini coefficient of household income as measured in the 2011 American Community Survey.
+\emph{Source}: \citet{Noss2012}.\\
+GDP/Capita  & 2011 state gross domestic product per capita, thousands of 2009 dollars.  \emph{Source}: U.S. Department of Commerce, Bureau of Economic Analysis.\\ 
+Ethnic Diversity & Probability that two randomly selected state residents belong to different racial or ethnic groups, calculated from standardized data from the U.S. Census. \emph{Source}: U.S. Census Bureau.\\
+Ballot Initiatives & Number of initiatives appearing on the state ballot.  \emph{Source}: Initiative \& Referendum Institute, University of Southern California, \texttt{http://www.iandrinstitute.org}.\\
+Gubernatorial Race & Dummy variable coded one if there was a simultaneous gubernatorial election, zero otherwise. \\
+Senatorial Race & Dummy variable coded one if there was a simultaneous U.S. Senate election, zero otherwise. \\
+Margin, Statewide Races &  Percentage of votes cast for winner minus percentage for second-place candidate in state's closest statewide race (governatorial, senatorial, or presidential).\\
+\hline
+\hline
+\end{tabular}
+\end{table}
+
+\pagebreak
+\section{An Additional Contextual Control}
+
+Our analysis incorporates an individual-level control for length of residence to account for the observation that those who have only recently moved in are likely to be less well-rooted to their communities and therefore less likely to participate in politics.  But, as \citet[204]{Putnam2000} wrote, just as recent movers ``have weaker community ties, so too are communities with higher rates of residential turnover less well integrated.''  \emph{Everyone} living in states that have higher proportions of new arrivals, then, could be expected to be less likely to participate in campaigns.  If this is true, and the proportion of new arrivals is positively related to income inequality, this 
+
+Further, across states, income inequality and the percentage of residents who were new to the state are highly negatively correlated ($R = —.60$), 
+
+
+
+<<label=app_m1a>>==
+# Lazy load the multiply imputed data generated in campaign_participation.Rnw from cache
+val <- gsub(".rdb", "", dir("cache", pattern = "^data_.*\\.rdb"))
+lazyLoad(file.path("cache", val), envir = parent.frame())
+
+# estimate m1
+m1a <- with(mdf_mi_list, 
+           glmer(formula = donate ~ gini_st + inc_rel + gini_st:inc_rel +
+                   gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
+                   movers_st +
+                   age + educated + homeowner + rep + dem + black + hisp + 
+                   male + married + children + church + union + resident +
+                   (1 + inc_rel|state_alpha), family=binomial(link="logit")))
+
+m1a_res <- format_mi_results(m1a)
+@
+
+<<label=app_m2a>>==
+# estimate m2
+m2a <- with(mdf_mi_list, 
+           glmer(formula = meetings ~ gini_st + inc_rel + gini_st:inc_rel +
+                   gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
+                   movers_st +
+                   age + educated + homeowner + rep + dem + black + hisp + 
+                   male + married + children + church + union + resident +
+                   (1 + inc_rel|state_alpha), family=binomial(link="logit")))
+
+m2a_res <- format_mi_results(m2a)
+@
+
+<<label=app_m3a>>==
+# estimate m3
+m3a <- with(mdf_mi_list, 
+           glmer(formula = polwork ~ gini_st + inc_rel + gini_st:inc_rel +
+                   gdppc_st + div_st + inits_st + gov_st + sen_st + swmar_st +
+                   movers_st +
+                   age + educated + homeowner + rep + dem + black + hisp + 
+                   male + married + children + church + union + resident +
+                   (1 + inc_rel|state_alpha), family=binomial(link="logit")))
+
+m3a_res <- format_mi_results(m3a)
+@
+
+
+<<label=app_reg_plot>>==
+level_brackets <- list(c("State Controls", "gdppc_st", "movers_st"),
+                       c("Individual Controls", "age", "resident"))
+
+vars_list <- c("gini_st", "inc_rel", "gini_st:inc_rel", "gdppc_st", "div_st",
+               "inits_st", "gov_st", "sen_st", "swmar_st", "movers_st",
+               "age", "educated", "homeowner", "male", "hisp", "black",
+               "married", "children", "rep", "dem", "church", "union", "resident")
+
+vars_proper <- c("Income Inequality", "Income Quintile", "Inequality X Income Quintile",
+         "GDP/Capita", "Ethnic Diversity", 
+         "Ballot Initiatives", "Gubernatorial Race", "Senatorial Race",
+         "Margin, Closest Statewide Race", "Population New to State",
+         "Age", "Education", "Homeowner", "Male",
+         "Latino", "African-American", "Married", "Children", 
+         "Republican", "Democrat", "Religious Attendance", "Union Member", "Length of Residence")
+
+m1a_res <- m1a_res[match(vars_list, m1a_res$term),]
+m2a_res <- m2a_res[match(vars_list, m2a_res$term),]
+m3a_res <- m3a_res[match(vars_list, m3a_res$term),]
+
+p <- rbind(m1a_res, m2a_res, m3a_res) %>% 
+  by_2sd(m1a[[1]]@frame) %>% 
+  dwplot() +
+  relabel_y_axis(vars_proper) +
+   theme_bw() + xlab("Coefficient Estimate") +
+  geom_vline(xintercept = 0, colour = "grey60", linetype = 2) +
+  theme(legend.position=c(.875, .08),
+        legend.background = element_rect(colour="grey80"),
+        legend.title.align = .5,
+        legend.text = element_text(size = 9),
+        legend.key.height = unit(12, "pt"),
+        legend.title = element_blank()) +
+  scale_colour_manual(values = c("red","black", "blue"),
+                    breaks = c("m1a", "m2a", "m3a"),
+                    labels = c("Make Donation", "Attend Meetings", "Work for Campaign"))
+g <- p %>% add_brackets(level_brackets)
+ggsave("figures/app_reg_plot.pdf", plot = g, width = 9, height = 6)  
+@
+
+<<label=app_coef_plot>>=
+gini_2sd <- 2 * sd(m1a[[1]]@frame[["gini_st"]])
+coefs_donate_app <- interplot(m1a, "gini_st", "inc_rel", plot = FALSE) %>% 
+  mutate_at(vars(-inc_rel), funs(. * gini_2sd)) %>% 
+  mutate(dv = "Make Donation")
+coefs_meetings_app <- interplot(m2a, "gini_st", "inc_rel", plot = FALSE) %>% 
+  mutate_at(vars(-inc_rel), funs(. * gini_2sd)) %>% 
+  mutate(dv = "Attend Meetings")
+coefs_polwork_app <- interplot(m3a, "gini_st", "inc_rel", plot = FALSE) %>% 
+  mutate_at(vars(-inc_rel), funs(. * gini_2sd)) %>% 
+  mutate(dv = "Work for Campaign")
+
+coefs_all_app <- bind_rows(coefs_donate_app, coefs_meetings_app, coefs_polwork_app) %>% 
+  mutate(quintile = factor(inc_rel, 
+                           levels = -2:2,
+                           labels = c("Poorest Quintile",
+                                      "Second Quintile",
+                                      "Median Quintile",
+                                      "Fourth Quintile",
+                                      "Richest Quintile")))
+
+pd <- position_dodge(.25)
+p2_app <- ggplot(data = coefs_all_app, aes(x = quintile, y = coef, colour = dv)) +
+  geom_point(position = pd) +
+  geom_errorbar(aes(ymin = lb, ymax = ub, width = 0), position=pd) +
+  ylab("Standardized Coefficient for Inequality") + xlab("") + theme_bw() +
+  scale_colour_manual(values = c("red","black", "blue")) +
+  theme(legend.title=element_blank(), 
+        legend.position=c(.1, .9),
+        legend.background = element_rect(colour="grey80")) +
+  geom_hline(yintercept=c(0), linetype="dotted")
+ggsave("figures/app_coef_plot.pdf", p2_app, width = 9, height = 6)
+@
+
+
+\begin{figure}[!hbtp] 
+  \caption{Effects of Income Inequality on Campaign Participation, Controlling for Residential Mobility}
+  \label{F:reg_plot}
+  \begin{center}
+    \includegraphics[width=6in]{figures/app_reg_plot.pdf}
+  \end{center}
+  \begin{footnotesize}
+  \begin{tabular}{p{.2in} p{5.8in}}
+  & \emph{Note}: The dots represent estimated change in the logged odds of the dependent variable occurring for a change of two standard deviations in the independent variable; the whiskers represent the 95\% confidence intervals of these estimates.
+  \end{tabular}
+  \end{footnotesize}
+\end{figure}
+
+
+\begin{figure}[!hbtp] 
+  \caption{Estimated Coefficients of Income Inequality by Income Quintile, Controlling for Residential Mobility}
+  \label{F:coef_plot}
+  \begin{center}
+    \includegraphics[width=6in]{figures/app_coef_plot.pdf}
+  \end{center}
+  \begin{footnotesize}
+  \begin{tabular}{p{.2in} p{5.8in}}
+  & \emph{Source}: Analyses presented in Figure~\ref{F:reg_plot}.  The dots represent estimated change in the logged odds of the dependent variable occurring for a change of two standard deviations in the income inequality; the whiskers represent the 95\% confidence intervals of these estimates.  
+  \end{tabular}
+  \end{footnotesize}
+\end{figure}
+
+\clearpage
+\pagebreak
+\newpage
+\bibliographystyle{ajps}
+\bibliography{FSLibrary}
+
+\end{document}
