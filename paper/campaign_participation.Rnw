@@ -745,6 +745,11 @@ Higher levels of inequality do more than merely signify that some have more of t
 Consistent with Schattschneider's (\citeyear{Schattschneider1960}) theorizing of more than a half-century ago, patterns of campaign activity indicate that economic inequality empowers wealthy citizens to reduce the scope and importance of politics in ways that make all citizens less likely to get involved.
 Where the gap between richer and poorer citizens are larger, democracy is correspondingly further from being reality.
 
+<<label=app_save>>==
+# save objects for use by campaign_participation_app.Rnw
+dir.create("../data", showWarnings = FALSE)
+save(list = c("mdf_mi_list", "format_mi_results"), file = "../data/campaign_participation.rda")
+@
 
 \end{spacing}
 
