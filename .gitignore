@@ -16,8 +16,9 @@
 *.snm
 *.ent
 *.docx
+*.synctex.gz
 .DS_Store
-paper/cache/*
-paper/appendix/cache/*
+paper/cache/
 data-raw/CCES12*
-old/*
+data/
+old/
