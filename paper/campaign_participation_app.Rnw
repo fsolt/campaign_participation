@@ -252,7 +252,7 @@ ggsave("figures/app_coef_plot.pdf", p2_app, width = 9, height = 6)
 
 Despite its unexpected sign, the high magnitude of the correlation between states' level of income inequality and their proportion of recent arrivals raises the potential for problems with multicollinearity. Figure~\ref{F:reg_plot} reproduces Figure~1 of the main text.  
 For all three forms of campaign participation, the estimated coefficient for the proportion of newcomers to a state is, contrary to theory, positive.  
-The results for income inequality are weaker than in Figure~1, and the coefficient of income inequality for those with median incomes is no longer statistically significant.  
+The estimated coefficients for income inequality are smaller than in Figure~1, and those for working for a campaign are no longer statistically significant at any income quintile.  
 This suggests that, in these models, the estimates for the proportion of new arrivals is not tapping any ways in which residential turnover weakens communities but rather, due to multicollinearity, simply a portion of the differences in campaign participation explained by income inequality.  
 For these reasons, we exclude agreggate residential mobility from the analyses presented in the main text.  
 
