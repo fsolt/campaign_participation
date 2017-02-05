@@ -331,28 +331,30 @@ Therefore, for individual $i$ in state $j$, the logged odds of each of the three
 \label{E:mixed}
   Campaign\thinspace Participation_{ij} & = & \gamma_{00}+\gamma_{10}Income\thinspace Quintile_{ij}
   \nonumber\\
-  & & {}+\gamma_{30}Age_{ij}+\gamma_{40}Education_{ij}{}+\gamma_{50}Republican_{ij}
+  & & {}+\gamma_{20}Age_{ij}+\gamma_{30}Education_{ij}{}+\gamma_{40}Homeowner_{ij}
   \nonumber\\
-  & & {}+\gamma_{60}Democrat_{ij}+\gamma_{70}Black_{ij}+\gamma_{80}Latino_{ij}
+  & & {}+\gamma_{50}Male_{ij}{}+\gamma_{60}Latino_{ij}+\gamma_{70}Black_{ij}
   \nonumber\\
-  & & {}+\gamma_{90}Male_{ij}{}+\gamma_{100}Married_{ij}{}+\gamma_{110} Children_{ij}
-    \nonumber\\
+  & & {}+\gamma_{80}Married_{ij}{}+\gamma_{90} Children_{ij}+\gamma_{100}Length\thinspace of\thinspace Residence_{ij}
+  \nonumber\\
+  & & {}+\gamma_{110}Republican_{ij}+\gamma_{120}Democrat_{ij}
+  \nonumber\\
   & & {}+\gamma_{120}Church\thinspace Attendance_{ij}{}+\gamma_{130}Union\thinspace Member_{ij}{}
   \nonumber\\ 
   & &{}+\gamma_{01}Inequality_{j}+\gamma_{11}Inequality_{j} \times Income\thinspace Quintile_{j}
   \nonumber\\
-  & &{}+\gamma_{02}Ethnic\thinspace Diversity_{j}+\gamma_{03}GDP/Capita_{j}
+  & &{}+\gamma_{02}GDP/Capita_{j}+\gamma_{03}Ethnic\thinspace Diversity_{j}
   \nonumber\\
   & &{}+\gamma_{04}Ballot\thinspace Initiatives_{j}+\gamma_{05}Gubernatorial\thinspace Race_{j}
   \nonumber\\
-  & &{}+\gamma_{05}Senate\thinspace Race_{j}+\gamma_{06}Statewide\thinspace Margin_{j}
+  & &{}+\gamma_{05}Senatorial\thinspace Race_{j}+\gamma_{06}Statewide\thinspace Margin_{j}
   \nonumber\\
   & &{}+r_{0j}+u_{0j}
  \end{eqnarray}
 }
 
 \noindent The inclusion of separate error terms for each state, $u_{0j}$, takes into account any state-level effects that are not in the model and so ameliorates any potential omitted variable bias while also ensuring that the standard errors of the state-level predictors are correctly calculated.
-The model was fit using the HLM software package.
+The model was fit using the \texttt{lme4} package in \R \citep{Bates2015}.
 
 Before proceeding to the results, we pause to review the expectations of the two theories tested.
 The relative power theory suggests that the coefficient of income inequality will be negative for people in all income quintiles.
@@ -489,7 +491,6 @@ ggsave("figures/coef_plot.pdf", p2, width = 9, height = 6)
 
 
 <<label=p_code>>==
-#echo=F, results=hide
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   require(grid)
   
@@ -641,13 +642,12 @@ pp_polwork_plot <- ggplot(pp_polwork, aes(x = gini_st, y = est, group = inc_rel)
 @
 
 <<label=pp_plot>>=
-# , echo=F, fig=T, include=F, width = 12, height = 5
 pdf("figures/pp_plot.pdf", width = 12, height = 5)
 multiplot(pp_donate_plot, pp_meetings_plot, pp_polwork_plot, layout = matrix(c(1, 2, 3), nrow=1))
 dev.off()
 @
 
-Figure~\ref{F:reg_plot} presents the results of the multilevel regression models as a dotplot: the dots represent the logit coefficients and the whiskers the associated 95\% confidence intervals \citep[see][]{Kastellec2007}.
+Figure~\ref{F:reg_plot} presents the results of the multilevel regression models as a dot-and-whisker plot: the dots represent the logit coefficients and the whiskers the associated 95\% confidence intervals \citep[see][]{Kastellec2007, Solt2015c}.
 To allow easier comparison, the coefficients of the ordinal and continuous independent variables were rescaled by multiplying the unstandardized coefficients by twice the standard deviation of the variable.  
 The rescaled coefficients represent the expected change in the logged odds of the dependent variable occurring for a change in the independent variable from one standard deviation below to one standard deviation above its mean, and so are directly comparable to those for the dichotomous independent variables \citep[see][]{Gelman2008a}.
 The control variables perform as expected: older and better-educated individuals were more likely to donate money, attend meetings, and volunteer for campaigns than their younger and worse-educated counterparts.
@@ -676,7 +676,7 @@ Turning toward our variables of greatest interest, we note first that the estima
 The coefficients depicted in Figure~\ref{F:reg_plot} for each variable are calculated with the other variable taking on its median value.
 One can see, therefore, that the coefficient of inequality is negative for those with median incomes and that the coefficient of income is positive in the median context of income inequality, but one cannot assess the competing claims of relative power theory and the resource theory without more information about how the coefficient of inequality varies across income quintiles.
 
-Figure~\ref{F:coef_plot} provides the necessary information.
+Figure~\ref{F:coef_plot}, plotted using the \R package \texttt{interplot} \citep{Solt2015b}, provides the necessary information. 
 It shows that the estimated coefficient for income inequality is negative and statistically significant across all income quintiles for campaign donations and for meeting attendance; for volunteering, it is estimated to be negative for all incomes but fails to reach statistical significance for those with incomes in the richest two quintiles.
 In states with higher levels of income inequality, people are less likely to participate in political campaign activities regardless of their own incomes.
 These results are consistent with the relative power theory and contradict the expectation of the resource theory that greater inequality would be associated with increased rates of participation among those in richer income quintiles.
