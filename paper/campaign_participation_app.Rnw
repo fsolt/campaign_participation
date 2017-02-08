@@ -78,7 +78,8 @@ African American & Dummy variable coded one if respondent was African American, 
 Latino & Dummy variable coded one if respondent was latino, zero otherwise. \emph{Source}: 2012 CCES.\\
 Male & Dummy variable coded one if respondent was male, zero otherwise. \emph{Source}: 2012 CCES.\\
 Married & Dummy variable coded one if respondent was married, zero otherwise. \emph{Source}: 2012 CCES.\\
-Church Attendance & Respondent's attendance at religious services on six-point scale: 1. never, 2. seldom, 3. few times a year, 4. once or twice a month, 5. once a week, 6. more than once a week. \emph{Source}: 2012 CCES.\\
+Length of Residence & Respondent's length of residence at current home on a four-point scale: 0. less than one year, 1. one to two years, 2. three to four years, 3. five or more years. \emph{Source}: 2012 CCES.\\
+Religious Attendance & Respondent's attendance at religious services on six-point scale: 1. never, 2. seldom, 3. few times a year, 4. once or twice a month, 5. once a week, 6. more than once a week. \emph{Source}: 2012 CCES.\\
 Union Member & Dummy coded one if respondent was a union member, zero otherwise. \emph{Source}: 2012 CCES.\\
 \hline
 \hline
