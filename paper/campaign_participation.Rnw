@@ -610,7 +610,7 @@ pp_donate_plot <- ggplot(pp_donate, aes(x = gini_st, y = est, group = inc_rel)) 
   theme_bw() + theme(legend.position="none") +
   ggtitle("Make Donation") + theme(plot.title = element_text(face="bold")) +
   geom_text(aes(.43, 39, label="Richest Quintile", color="2")) +
-  geom_text(aes(.46, 9, label="Poorest Quintile", color="-2")) +
+  geom_text(aes(.48, 8.5, label="Poorest Quintile", color="-2")) +
   scale_x_continuous(limits=c(.40, .504), breaks=seq(.40, .50, .02)) +
   scale_colour_manual(values = c("red", "blue")) +
   scale_fill_manual(values = c("red", "blue"))
@@ -621,8 +621,8 @@ pp_meetings_plot <- ggplot(pp_meetings, aes(x = gini_st, y = est, group = inc_re
   xlab("Income Inequality") + ylab("") +
   theme_bw() + theme(legend.position="none") +
   ggtitle("Attend Meetings") + theme(plot.title = element_text(face="bold")) +
-  geom_text(aes(.435, 18, label="Richest Quintile", color="2")) +
-  geom_text(aes(.47, 5, label="Poorest Quintile", color="-2")) +
+  geom_text(aes(.43, 18.5, label="Richest Quintile", color="2")) +
+  geom_text(aes(.48, 5, label="Poorest Quintile", color="-2")) +
   scale_x_continuous(limits=c(.40, .504), breaks=seq(.40, .50, .02)) +
   scale_colour_manual(values = c("red", "blue")) +
   scale_fill_manual(values = c("red", "blue"))
@@ -633,8 +633,8 @@ pp_polwork_plot <- ggplot(pp_polwork, aes(x = gini_st, y = est, group = inc_rel)
   xlab("") + ylab("") +
   theme_bw() + theme(legend.position="none") +
   ggtitle("Work for Campaign") + theme(plot.title = element_text(face="bold")) +
-  geom_text(aes(.43, 8, label="Richest Quintile", color="2")) +
-  geom_text(aes(.46, 3.8, label="Poorest Quintile", color="-2")) +
+  geom_text(aes(.43, 8.6, label="Richest Quintile", color="2")) +
+  geom_text(aes(.48, 2.8, label="Poorest Quintile", color="-2")) +
   scale_y_continuous(limits=c(2, 10)) +
   scale_x_continuous(limits=c(.40, .504), breaks=seq(.40, .50, .02)) +
   scale_colour_manual(values = c("red", "blue")) +
@@ -653,7 +653,7 @@ The rescaled coefficients represent the expected change in the logged odds of th
 The control variables perform as expected: older and better-educated individuals were more likely to donate money, attend meetings, and volunteer for campaigns than their younger and worse-educated counterparts.
 Those who identified as Republicans and especially Democrats were more likely to donate or volunteer than independents, though they attended political meetings at similar rates.
 African-Americans and Latinos were considerably less likely than Anglo whites to participate in campaigns.
-Men were more likely to women to donate money or attend meetings, but otherwise similar people of both genders volunteered to work on campaigns at similar rates.
+Men were more likely than women to donate money or attend meetings, but otherwise similar people of both genders volunteered to work on campaigns at similar rates.
 Married people were less likely to participate in campaign activities.
 The estimated coefficient for children is negative for donating money but positive for attending meetings; that for volunteering is negative but cannot be distinguished from zero in these data.
 More frequent attendance at religious services was associated with higher rates of meeting attendance and campaign volunteering but lower rates of political donations.
