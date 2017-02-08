@@ -339,7 +339,7 @@ Therefore, for individual $i$ in state $j$, the logged odds of each of the three
   \nonumber\\
   & & {}+\gamma_{110}Republican_{ij}+\gamma_{120}Democrat_{ij}
   \nonumber\\
-  & & {}+\gamma_{120}Church\thinspace Attendance_{ij}{}+\gamma_{130}Union\thinspace Member_{ij}{}
+  & & {}+\gamma_{130}Church\thinspace Attendance_{ij}{}+\gamma_{140}Union\thinspace Member_{ij}{}
   \nonumber\\ 
   & &{}+\gamma_{01}Inequality_{j}+\gamma_{11}Inequality_{j} \times Income\thinspace Quintile_{j}
   \nonumber\\
@@ -347,7 +347,7 @@ Therefore, for individual $i$ in state $j$, the logged odds of each of the three
   \nonumber\\
   & &{}+\gamma_{04}Ballot\thinspace Initiatives_{j}+\gamma_{05}Gubernatorial\thinspace Race_{j}
   \nonumber\\
-  & &{}+\gamma_{05}Senatorial\thinspace Race_{j}+\gamma_{06}Statewide\thinspace Margin_{j}
+  & &{}+\gamma_{06}Senatorial\thinspace Race_{j}+\gamma_{07}Statewide\thinspace Margin_{j}
   \nonumber\\
   & &{}+r_{0j}+u_{0j}
  \end{eqnarray}
