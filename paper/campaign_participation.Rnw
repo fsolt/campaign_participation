@@ -309,7 +309,7 @@ Because the same income falls in different positions of the income distribution 
 While an annual family income of \$80,000 was sufficient to reach the richest quintile in Arkansas or Mississippi, for example, at least \$120,000 was needed in New Jersey or Virginia.
 To facilitate interpretation, the variable was centered so that 0 represents the median quintile, -2 the poorest quintile, and 2 the richest quintile. 
 
-The CCES also provides data on many other individual-level characteristics well understood to be associated with at least some forms of political participation: age, education, partisan identification, race and ethnicity, gender, marital status, number of children, frequency of church attendance, and union membership.\footnote{\doublespacing Two other variables common in the literature on voting, home ownership and length of residence, were found not to be strongly associated with campaign participation, and their inclusion does not affect our conclusions.}
+The CCES also provides data on many other individual-level characteristics well understood to be associated with at least some forms of political participation: age, education, home ownership, partisan identification, race and ethnicity, gender, marital status, number of children, length of residence, frequency of church attendance, and union membership.
 We include these variables as controls in our analysis.  
 
 There are also aspects of state context that have been found to be associated with various forms of political participation that are important to consider here.
@@ -648,15 +648,18 @@ dev.off()
 @
 
 Figure~\ref{F:reg_plot} presents the results of the multilevel regression models as a dot-and-whisker plot: the dots represent the logit coefficients and the whiskers the associated 95\% confidence intervals \citep[see][]{Kastellec2007, Solt2015c}.
-To allow easier comparison, the coefficients of the ordinal and continuous independent variables were rescaled by multiplying the unstandardized coefficients by twice the standard deviation of the variable.  
+To facilitate comparison, the coefficients of the ordinal and continuous independent variables were rescaled by multiplying the unstandardized coefficients by twice the standard deviation of the variable.  
 The rescaled coefficients represent the expected change in the logged odds of the dependent variable occurring for a change in the independent variable from one standard deviation below to one standard deviation above its mean, and so are directly comparable to those for the dichotomous independent variables \citep[see][]{Gelman2008a}.
 The control variables perform as expected: older and better-educated individuals were more likely to donate money, attend meetings, and volunteer for campaigns than their younger and worse-educated counterparts.
-Those who identified as Republicans and especially Democrats were more likely to donate or volunteer than independents, though they attended political meetings at similar rates.
-African-Americans and Latinos were considerably less likely than Anglo whites to participate in campaigns.
+Homeowners were more likely than renters to donate money and attend meetings, all else equal, but not to work for campaigns.
+Those who identified as Republicans and especially Democrats were more likely to donate or volunteer than independents, though Democrats attended political meetings at similar rates and Republicans were less likely to do so.
+Latinos were estimated to be considerably less likely than Anglo whites to participate in campaigns.
+African-Americans were also less likely to attend political meetings, but they were more likely to donate or volunteer than otherwise similar Anglo whites in 2012.
 Men were more likely than women to donate money or attend meetings, but otherwise similar people of both genders volunteered to work on campaigns at similar rates.
-Married people were less likely to participate in campaign activities.
-The estimated coefficient for children is negative for donating money but positive for attending meetings; that for volunteering is negative but cannot be distinguished from zero in these data.
-More frequent attendance at religious services was associated with higher rates of meeting attendance and campaign volunteering but lower rates of political donations.
+Married people were found to be less likely to donate money or volunteer for a campaign than singles.
+The estimated coefficients for children are negative for donating money and volunteering but positive for attending meetings.
+More established residents were more likely to attend meetings than those who had recently moved.
+More frequent attendance at religious services was associated with higher rates of meeting attendance and campaign volunteering but similar rates of political donations.
 Union members were more likely than otherwise similar non-members to engage in all three forms of campaign participation. 
 
 \begin{figure}[!hbtp] 
@@ -713,17 +716,17 @@ We used the model parameters estimated in Figure~\ref{F:reg_plot} to compute the
 
 Figure~\ref{F:pp_plot} plots the results, showing that inequality sharply reduces participation in all three campaign activities examined here.
 Consider first campaign donations, shown in the leftmost panel of the figure.
-In a state with income inequality matching that of Wyoming, the lowest observed, an otherwise typical person in the poorest quintile was estimated to have 14\% chance (plus or minus 2 percentage points) of making a political donation.
-This probability falls by nearly half, to $8\pm1$\%, for a similar person in a state with New York's level of income inequality, the highest observed.
-For such individuals in the richest quintile, the predicted probability of making a political donation falls by about a third, from $32\pm5$\% to $22\pm3$\%, as inequality ranges from its lowest to highest observed value.
+In a state with income inequality matching that of Wyoming, the lowest observed, an otherwise typical person in the poorest quintile was estimated to have 19\% chance (plus or minus 3 percentage points) of making a political donation.
+This probability falls by nearly half, to $10\pm2$\%, for a similar person in a state with New York's level of income inequality, the highest observed.
+For such individuals in the richest quintile, the predicted probability of making a political donation falls by less than a third, from $34\pm5$\% to $24\pm3$\%, as inequality ranges from its lowest to highest observed value.
 
 People are also much less likely to attend political meetings when inequality is higher, as shown in the center panel.
-For those in the poorest quintile, the predicted probability of having attended a political meeting during the campaign is $12\pm2$\% at the lowest observed level of inequality, but less than half that, $5\pm1$\%, at the highest observed level.
-For those in the richest quintile, the predicted probability of attending meetings drops from $16\pm3$\% to $9\pm2$\%.
+For those in the poorest quintile, the predicted probability of having attended a political meeting during the campaign is $13\pm3$\% at the lowest observed level of inequality, but less than half that, $6\pm1$\%, at the highest observed level.
+For those in the richest quintile, the predicted probability of attending meetings drops from $15\pm3$\% to $9\pm2$\%.
 
 Finally, the left panel of Figure~\ref{F:pp_plot} presents the predicted probabilities of volunteering to work for a campaign.
 Again assuming otherwise mean characteristics, those in the poorest quintile have a predicted probability of volunteering of $6\pm2$\% when they live in a state with the lowest observed level of inequality.
-This predicted probability declines to $3.1\pm0.6$ when inequality is at highest observed level.  For those in the richest quintile, volunteering does not change by a statistically significant amount over the range of income inequality: the predicted probability varies from $6\pm2$\% to $5\pm1$\%.\footnote{\doublespacing For those with incomes in the median quintile, the predicted probability of volunteering ranges from $6\pm1$\% to $3.9\pm0.8$ over the observed range of income inequality.}
+This predicted probability declines to $3.5\pm0.8$ when inequality is at highest observed level.  For those in the richest quintile, volunteering does not change by a statistically significant amount over the range of income inequality: the predicted probability varies from $6.6\pm1.3$\% to $5.4\pm1.2$\%.\footnote{\doublespacing For those with incomes in the median quintile, the predicted probability of volunteering ranges from $6.5\pm1.6$\% to $4.9\pm0.9$ over the observed range of income inequality.}
 
 \section*{Discussion and Conclusion}
 
