@@ -65,7 +65,7 @@ opts_chunk$set(concordance=TRUE, cache=TRUE, warning=FALSE, message=FALSE, echo=
 \textbf{Individual Characteristics}\\
 \hline
 \hline
-Make Donation & Dummy variable coded one if respondent made a political donation in the past year. \emph{Source}: 2012 Cooperative Congressional Election Study \citep{Ansolabehere2013a}.\\
+Make Donation & Dummy variable coded one if respondent made a political donation in the past year. \emph{Source}: 2012 Cooperative Congressional Election Study \citep{Ansolabehere2015}.\\
 Attend Meetings & Dummy variable coded one if respondent attended a political meeting in the past year. \emph{Source}: 2012 CCES.\\
 Work for Campaign & Dummy variable coded one if respondent did volunteer work for a political campaign in the past year. \emph{Source}: 2012 CCES.\\
 Income Quintile & Quintile within state of respondent's household income. \emph{Source}: 2012 CCES.\\
