@@ -737,7 +737,9 @@ This study provides a first examination of the relationship between economic ine
 Analyzing data on political donations, attendance at political meetings, and volunteering for political campaigns in 2012, it finds support for the predictions of the relative power theory: where income inequality is higher, campaign participation is lower, regardless of individuals' incomes.
 This accords with the results of previous studies that examined less resource-intensive forms of political participation and undercuts the argument that activities that demand more time and money from participants will be better explained by the resource theory.  
 
-Rather than simply reflecting the fact that higher levels of economic inequality mean that poorer people will have less and richer people more of the resources needed to participate in politics, the patterns of campaign participation found here evince how inequality empowers higher-income citizens 
+Instead, it supports the claims of the relative power theory: that higher levels of economic inequality mean that poorer people will have less and richer people more of the resources needed not simply to participate in campaign activities, but to shape \emph{the scope of politics}.  
+Where inequality is greater, those with higher incomes have more money to amplify their arguments in whatever disagreements they may have with each other, effectively raising the cost of putting issues on the agenda in the very setting that lower-income people have fewer resources to pay this price---or, for that matter, even to independently formulate their own concerns.  
+The resulting more complete exclusion of those issues that do not divide the wealthy makes politics less important to everyone regardless of income, and as a result everyone is less likely to participate in political campaigns.
 
 Along with better illuminating the relationship between inequality and participation, these results also provide new support for arguments recently made in the study of representation.
 A number of recent works have documented how legislators are much more responsive to the preferences of richer Americans than they are to those of their poorer constituents, both in Congress \citep{Bartels2008, Gilens2012} and in the statehouses \citep{Rigby2011a}.
@@ -745,11 +747,11 @@ And, as \citet{Rigby2013} have found, this attentiveness to the views of the aff
 This line of scholarship has surmised that higher levels of inequality work to strengthen the relationship between income and responsiveness by making politicians increasingly dependent on the campaign support of fewer, wealthier donors (e.g., \citealt[252]{Gilens2012}; \citealt[563-564]{Rigby2013}).
 Our finding that people are less likely to participate in campaigns---and specifically that people of all incomes are less likely to make campaign donations---provides a first empirical confirmation of this causal mechanism.
 As we have shown, when economic inequality is greater, politicians do in fact draw on a smaller number of donors; such circumstances make them more reliant on the bigger gifts that only the affluent can make.
-It is not surprising, then, that politicians in turn respond only to the views of the wealthy.
+It is not surprising, then, that politicians in turn respond primarily to the views of the wealthy.
 
 Finally, that participation in campaigns is lower where economic inequality is higher provides direct evidence of the state of the ongoing struggle for democracy and political equality in America.
 Higher levels of inequality do more than merely signify that some have more of the resources needed to participate while others have fewer of these resources.
-Consistent with Schattschneider's (\citeyear{Schattschneider1960}) theorizing more than a half-century ago, patterns of campaign activity indicate that economic inequality empowers wealthy citizens to reduce the scope and importance of politics in ways that make all citizens less likely to get involved.
+Consistent with Schattschneider's (\citeyear{Schattschneider1960}) theorizing of more than a half-century ago, patterns of campaign activity indicate that economic inequality empowers wealthy citizens to reduce the scope and importance of politics in ways that make all citizens less likely to get involved.
 Where the gap between richer and poorer citizens are larger, democracy is correspondingly further from being reality.
 
 <<label=app_save>>==
