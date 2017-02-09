@@ -61,6 +61,7 @@ opts_chunk$set(concordance=TRUE, cache=TRUE, warning=FALSE, message=FALSE, echo=
 
 
 \begin{table}[hbtp] 
+\begin{footnotesize}
 \begin{tabular}{l p{10cm}}
 \textbf{Individual Characteristics}\\
 \hline
@@ -84,11 +85,13 @@ Union Member & Dummy coded one if respondent was a union member, zero otherwise.
 \hline
 \hline
 \end{tabular}
+\end{footnotesize}
 \end{table}
 
-\vspace{1in}
 
-\begin{table}[hbtp]
+\pagebreak
+
+\begin{table}[t!]
 \begin{tabular}{l p{10cm}}
 \textbf{Contextual Characteristics}\\
 \hline
@@ -107,7 +110,9 @@ Margin, Statewide Races &  Percentage of votes cast for winner minus percentage 
 \end{table}
 
 
+\clearpage
 \pagebreak
+\newpage
 \section{Aggregate Residential Mobility as a Contextual Control}
 
 Our analysis incorporates an individual-level control for length of residence to account for the observation that those who have only recently moved in are likely to be less well-rooted to their communities and therefore less likely to participate in politics.
