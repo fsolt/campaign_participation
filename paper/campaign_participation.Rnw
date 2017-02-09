@@ -79,14 +79,14 @@ This finding indicates that even participation in those political activities tha
 \section*{Economic Inequality, Income, and Participation}
 
 Anticipated by \citet{Schattschneider1960}, introduced by \citet{Goodin1980}, and elaborated by \citet{Solt2008}, the relative power theory maintains that economic inequality yields political inequality.
-It contends that contexts of greater economic inequality enable richer individuals not simply to prevail more often in an actual political contests, but also to more fully reshape the political agenda to effectively exclude issues poorer that citizens would have otherwise wished to debate, and even to more completely convince these poorer citizens to abandon preferences they would have otherwise held.
+It contends that contexts of greater economic inequality enable richer individuals not simply to prevail more often in an actual political contests, but also to more fully reshape the political agenda to  exclude whatever issues that poorer citizens would have otherwise wished to debate, and even to more completely convince these poorer citizens to abandon preferences they would have otherwise held.
 Compared to more equal contexts, political debate will revolve more exclusively around arguments among richer citizens; attempts to raise issues that would tend to cleave richer and poorer citizens are drowned out by the money-magnified voices of both sides involved in ongoing arguments among the rich.
-As a consequence of the more restricted scope of politics in unequal settings, people of all incomes are expected to become less likely to participate: the poor because their needs are unlikely to be debated let alone ultimately addressed, and the rich to the extent that they consider their internecine struggles to be of less importance than whatever matters would have pitted them against the poor.
+As a consequence of the more restricted scope of politics in unequal settings, people of all incomes are expected to become less likely to participate: the poor because their concerns are unlikely to be debated let alone ultimately addressed, and the rich to the extent that they consider their internecine struggles to be of less importance than whatever matters would have pitted them against the poor.
 
 The resource theory provides the leading alternative argument about the relationship between inequality and participation to that proposed by the relative power theory.
 As \citet{Verba1995} explain, participation in politics places demands on individuals' time and money.  Participating in politics, and especially in campaigns, is like any other normal good in this view: those with more money and time will consume more of it than those with less \citep{Ansolabehere2003}.
 Coupled with the facts that higher inequality by definition means that more money is concentrated in fewer hands and that those with more money are better able to afford the cost of time spent not working, the focus on resources yields the hypothesis that greater inequality will result in \emph{more} participation by the relatively affluent and less participation only among the relatively poor.\footnote{\doublespacing Yet a third theoretical perspective contends that the more divergent material conditions of richer and poorer citizens in contexts of higher inequality will spark more contentious---and therefore more interesting---politics and so coincide with greater rates of participation across all income levels \citep[see][]{Brady2004}.  
-This conflict theory, however, has not received much empirical support in prior research \citep[see, e.g.,][]{Solt2016b, Solt2017}.  
+This conflict theory, however, has not received much, if any, empirical support in prior research \citep[see, e.g.,][]{Solt2016b, Solt2017}.  
 We therefore focus our discussion here on the predictions of the relative power and resource theories.}
 
 Substantial empirical evidence has accumulated of late for the prediction of relative power theory that more economic inequality is associated with less political participation.
@@ -126,6 +126,8 @@ library(dotwhisker)
 library(interplot)
 
 @
+
+% To replicate, one must first download CCES12_Common_VV.RData Version 8.0 from hdl:1902.1/21447
 
 <<label=data>>==
 # To replicate, one must first download CCES12_Common_VV.RData from hdl:1902.1/21447
@@ -255,7 +257,7 @@ levels(cp_st1$variable)[levels(cp_st1$variable)=="work"]   <- "Work for Campaign
 @
 
 
-To measure the dependent variable, participation in campaigns, we employ data drawn from the 2012 Cooperative Congressional Election Study (CCES).
+To measure the dependent variable, participation in campaigns, we employ data drawn from the 2012 Cooperative Congressional Election Study (CCES, \citealt{Ansolabehere2015}).
 The CCES is a nationwide, online survey of over 54,000 respondents drawn from all fifty states.
 The 2012 survey was conducted in two waves, the first during the month before the November general election and the second within two weeks afterwards \citep[7]{Ansolabehere2013}.
 The CCES asked respondents whether in the past year they had (1) donated money to a candidate, campaign, or political organization; (2) attended a local political meeting; or (3) worked for a candidate or campaign.
@@ -354,7 +356,7 @@ Therefore, for individual $i$ in state $j$, the logged odds of each of the three
 }
 
 \noindent The inclusion of separate error terms for each state, $u_{0j}$, takes into account any state-level effects that are not in the model and so ameliorates any potential omitted variable bias while also ensuring that the standard errors of the state-level predictors are correctly calculated.
-The model was fit using the \texttt{lme4} package in \R \citep{Bates2015}.
+The model was fit in \R using the \texttt{lme4} package \citep{Bates2015}.
 
 Before proceeding to the results, we pause to review the expectations of the two theories tested.
 The relative power theory suggests that the coefficient of income inequality will be negative for people in all income quintiles.
@@ -734,6 +736,8 @@ As the growth of economic inequality in the United States over the past several 
 This study provides a first examination of the relationship between economic inequality and participation in campaign activities.  
 Analyzing data on political donations, attendance at political meetings, and volunteering for political campaigns in 2012, it finds support for the predictions of the relative power theory: where income inequality is higher, campaign participation is lower, regardless of individuals' incomes.
 This accords with the results of previous studies that examined less resource-intensive forms of political participation and undercuts the argument that activities that demand more time and money from participants will be better explained by the resource theory.  
+
+Rather than simply reflecting the fact that higher levels of economic inequality mean that poorer people will have less and richer people more of the resources needed to participate in politics, the patterns of campaign participation found here evince how inequality empowers higher-income citizens 
 
 Along with better illuminating the relationship between inequality and participation, these results also provide new support for arguments recently made in the study of representation.
 A number of recent works have documented how legislators are much more responsive to the preferences of richer Americans than they are to those of their poorer constituents, both in Congress \citep{Bartels2008, Gilens2012} and in the statehouses \citep{Rigby2011a}.
