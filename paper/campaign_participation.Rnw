@@ -40,23 +40,24 @@ opts_chunk$set(concordance=TRUE, cache=TRUE, warning=FALSE, message=FALSE, echo=
 
 
 \title{Economic Inequality and\\ Campaign Participation}		
-% \author{
-%     Michael Ritter\\
-%     \href{mailto:michael-ritter@uiowa.edu}{michael-ritter@uiowa.edu}
-%     \and
-%     Frederick Solt\\
-%     \href{mailto:frederick-solt@uiowa.edu}{frederick-solt@uiowa.edu}
-% }
+\author{
+    Michael Ritter\\
+    \href{mailto:michael-ritter@uiowa.edu}{michael-ritter@uiowa.edu}
+    \and
+    Frederick Solt\\
+    \href{mailto:frederick-solt@uiowa.edu}{frederick-solt@uiowa.edu}\thanks{\emph{Replication files are available on the Dataverse at \url{http://dx.doi.org/10.7910/DVN/LPPNY1}. The article's revision history can be found on Github at \url{https://github.com/fsolt/campaign_participation}.}
+}
 \date{}				
 \maketitle
 
 \begin{abstract}
-How does economic inequality shape participation in political campaigns?  
+\emph{Objective.} How does economic inequality shape participation in political campaigns?  
 Several studies have found that higher levels of inequality make people of all incomes less likely to participate in politics, consistent with relative power theory, the view that greater inequality enables wealthier citizens to more fully reshape the political landscape to their own advantage.
 These works, however, addressed relatively undemanding forms of participation like voting.
 Campaign activities demand more of participants' time and money and so might better conform to the predictions of resource theory, which focuses narrowly on the ramifications of inequality for individuals' resources.
-We combine individual-level data on donations, meeting attendance, and volunteer work for political campaigns with measures of state-level income inequality to construct a series of multilevel models.
-The analyses reveal that, where inequality is higher, campaign participation is lower among individuals of all incomes, providing additional support for the relative power theory.
+\emph{Methods.} We combine individual-level data on donations, meeting attendance, and volunteer work for political campaigns with measures of state-level income inequality to construct a series of multilevel models.
+\emph{Results.} The analyses reveal that, where inequality is higher, campaign participation is lower among individuals of all incomes. 
+\emph{Conclusions.} Even for resource-intensive forms of campaign activity, patterns of political participation do not accord with the predictions of resource theory; instead, these patterns provide additional support for the relative power theory.
 \end{abstract}
 
 
@@ -65,10 +66,10 @@ The analyses reveal that, where inequality is higher, campaign participation is 
 Economic inequality has risen dramatically in the United States over the past several decades; by some measures, income is now more concentrated than at any time since the start of the Great Depression \citep[see, e.g.,][24]{Piketty2014}.
 Although the consequences of such high levels of inequality for participation in elections have attracted sustained attention \citep[see, e.g.,][]{Brady2004, Galbraith2008, Solt2010}, participation in the campaigns that precede elections has not yet been examined.  
 
-This is an important oversight because voting is a fairly undemanding form of political participation.
+This is an important oversight because voting is a relatively undemanding form of political participation.
 Studies of voting have found that higher levels of inequality make people of all incomes less likely to participate in politics.
 This is consistent with relative power theory, the view that greater inequality enables wealthier citizens to more fully reshape the political landscape to their own advantage.
-Campaign activities place more demands on participants' time and money and so might be expected to be better predicted by arguments that focus narrowly on the ramifications of inequality for individuals' resources.
+Campaign activities, on the other hand, place more demands on participants' time and money and so might be expected to be better predicted by arguments that focus narrowly on the ramifications of inequality for individuals' resources.
 If they are, the understanding of economic inequality's political effects that is provided by the relative power theory will stand in need of revision.
 
 In this article, we present multilevel models that bring together data on individual campaign participation (donating money, attending meetings, and volunteering for campaigns) from the 2012 Cooperative Congressional Election Study with data on the context of income inequality in the fifty states provided by the U.S. Census Bureau.
