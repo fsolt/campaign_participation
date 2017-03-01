@@ -293,6 +293,6 @@ For these reasons, we exclude agreggate residential mobility from the analyses p
 \pagebreak
 \newpage
 \bibliographystyle{ajps}
-\bibliography{FSLibrary}
+\bibliography{campaign_participation}
 
 \end{document}

@@ -766,7 +766,7 @@ save(list = c("mdf_mi_list", "format_mi_results"), file = "../data/campaign_part
 \pagebreak
 \newpage
 \bibliographystyle{ajps}
-\bibliography{FSLibrary}
+\bibliography{campaign_participation}
 
 
 
