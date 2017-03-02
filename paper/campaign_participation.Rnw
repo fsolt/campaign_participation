@@ -44,7 +44,7 @@ opts_chunk$set(concordance=TRUE, cache=TRUE, warning=FALSE, message=FALSE, echo=
     Michael Ritter\\
     \href{mailto:michael-ritter@uiowa.edu}{michael-ritter@uiowa.edu}
     \and
-    Frederick Solt\thanks{Replication files are available on the Dataverse at \url{http://dx.doi.org/10.7910/DVN/LPPNY1}. The article's revision history can be found on Github at \url{https://github.com/fsolt/campaign_participation}.}\\
+    Frederick Solt\thanks{Direct all correspondence to Frederick Solt, Department of Political Science, 341 Schaeffer Hall, University of Iowa, Iowa City, Iowa 52242, \texttt{<}\href{mailto:frederick-solt@uiowa.edu}{frederick-solt@uiowa.edu}\texttt{>}.  Replication files are available on the Dataverse at \url{http://dx.doi.org/10.7910/DVN/LPPNY1}. The article's revision history can be found on Github at \url{https://github.com/fsolt/campaign_participation}.  An appendix is available at \url{http://fsolt.org}.  We are grateful to Nathan Kelly, Benjamin Page, and Caroline Tolbert for their helpful comments on an earlier version of this work.}\\
     \href{mailto:frederick-solt@uiowa.edu}{frederick-solt@uiowa.edu}
 }
 \date{}				
@@ -323,7 +323,7 @@ The presence on the ballot of a high-profile statewide race in addition to the p
 We include separate indicators for the states that held a concurrent gubernatorial election and for the states that elected senators in 2012.
 People are also more likely to participate when there is a closely contested race in their state \citep[see, e.g.,][]{Cox1989}, so we include the margin of the closest statewide race (presidential, gubernatorial, or senatorial) as well.
 Finally, because ballot issues have the potential to draw more people to engage with campaigns \citep[see, e.g.,][]{Tolbert2005}, the number of initiatives on the ballot in the state is also included in the model.
-Coding and sources for all included variables are provided in Appendix A.
+Coding and sources for all included variables are provided in an online appendix.
 
 Because the data include variables at the levels of the individual and of the state, a multilevel model is necessary to avoid underestimating the standard errors of the contextual variables \citep[see, e.g.,][]{Steenbergen2002}.
 And because the resource theory contends that whether the context of inequality depresses or encourages participation depends on individual's position in the income distribution, a multiplicative interaction of inequality and relative income must also be included.
@@ -701,7 +701,7 @@ These results are consistent with the relative power theory and contradict the e
 
 Of course, because the dependent variables are dichotomous, the coefficient estimates are in logits.
 This makes their magnitudes difficult to assess directly.
-We used the model parameters estimated in Figure~\ref{F:reg_plot} to compute the predicted probabilities that an individuals in the poorest and richest quintiles would participate in campaigns over the observed range of income inequality, assuming mean values for the other individual- and state-level variables \citep[see][]{King2000}.
+We used the model parameters estimated in Figure~\ref{F:reg_plot} to compute the predicted probabilities that individuals in the poorest and richest quintiles would participate in campaigns over the observed range of income inequality, assuming mean values for the other individual- and state-level variables \citep[see][]{King2000}.
 
 \begin{figure}[!hbtp] 
   \caption{Predicted Probability of Campaign Participation by Income and Level of Inequality}
